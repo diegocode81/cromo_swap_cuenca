@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/exchange-agent",
-      "schedule": "0 * * * *"
+      "schedule": "0 12 * * *"
     }
   ]
 }

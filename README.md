@@ -77,7 +77,7 @@ npm run build
 4. Ejecuta seed una vez: `npm run prisma:seed`.
 5. Despliega en Vercel.
 
-`vercel.json` ejecuta `/api/cron/exchange-agent` cada hora. El endpoint valida `CRON_SECRET` por header `Authorization: Bearer <secret>` o query `?secret=<secret>`.
+`vercel.json` ejecuta `/api/cron/exchange-agent` una vez al dia para ser compatible con Vercel Hobby. En Vercel Pro puedes cambiar el schedule a `0 * * * *` para ejecutarlo cada hora. El endpoint valida `CRON_SECRET` por header `Authorization: Bearer <secret>` o query `?secret=<secret>`.
 
 ## Arquitectura
 
