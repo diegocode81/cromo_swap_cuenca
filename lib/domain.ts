@@ -5,7 +5,7 @@ export function orderedPair(userAId: string, userBId: string) {
 }
 
 export async function getActiveAlbum() {
-  return prisma.album.findFirst({ where: { isActive: true } });
+  return prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
 }
 
 export async function requireActiveAlbum() {
@@ -17,6 +17,7 @@ export async function requireActiveAlbum() {
 export type StickerPayload = {
   id: string;
   number: number;
+  code: string;
   name: string;
   section: string;
 };

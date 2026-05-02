@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function AdminPage() {
   await requireAdmin();
-  const activeAlbum = await prisma.album.findFirst({ where: { isActive: true } });
+  const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
   const [users, stickers, matches, reports] = await Promise.all([
     prisma.user.count(),
     prisma.userSticker.count(),
@@ -19,7 +19,7 @@ export default async function AdminPage() {
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-3xl font-black">Panel administrador</h1>
-          <p className="text-slate-600">Album activo: {activeAlbum?.name ?? "Sin album activo"}</p>
+          <p className="text-slate-600">Album activo para usuarios: {activeAlbum?.name ?? "Sin album activo"}</p>
         </div>
         <RunAgentButton />
       </div>

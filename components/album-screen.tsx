@@ -7,10 +7,10 @@ export async function AlbumScreen({ defaultStatus }: { defaultStatus?: "HAVE" | 
   const user = await requireUser();
   const album = await requireActiveAlbum();
   const [stickers, entries, historicalAlbums] = await Promise.all([
-    prisma.sticker.findMany({ where: { albumId: album.id }, orderBy: { number: "asc" } }),
+    prisma.sticker.findMany({ where: { albumId: album.id }, orderBy: [{ code: "asc" }, { number: "asc" }] }),
     prisma.userSticker.findMany({ where: { userId: user.id, albumId: album.id }, include: { sticker: true } }),
     prisma.album.findMany({
-      where: { isActive: false },
+      where: { status: { not: "ACTIVE" } },
       orderBy: { createdAt: "desc" },
       include: { _count: { select: { stickers: true, userStickers: true, matches: true } } }
     })
@@ -26,6 +26,7 @@ export async function AlbumScreen({ defaultStatus }: { defaultStatus?: "HAVE" | 
         stickers={stickers.map((sticker) => ({
           id: sticker.id,
           number: sticker.number,
+          code: sticker.code,
           name: sticker.name,
           section: sticker.section
         }))}
@@ -36,6 +37,7 @@ export async function AlbumScreen({ defaultStatus }: { defaultStatus?: "HAVE" | 
           sticker: {
             id: entry.sticker.id,
             number: entry.sticker.number,
+            code: entry.sticker.code,
             name: entry.sticker.name,
             section: entry.sticker.section
           }

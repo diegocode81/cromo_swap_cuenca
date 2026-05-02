@@ -5,7 +5,7 @@ import { StatCard } from "@/components/stat-card";
 
 export default async function DashboardPage() {
   const user = await requireUser();
-  const activeAlbum = await prisma.album.findFirst({ where: { isActive: true } });
+  const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
   const [registered, repeated, missing, matches, unreadMessages] = await Promise.all([
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id } }) : 0,
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id, status: "REPEATED" } }) : 0,

@@ -5,28 +5,42 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.$transaction(async (tx) => {
-    await tx.album.updateMany({ data: { isActive: false } });
+    await tx.album.updateMany({ data: { isActive: false, status: "ARCHIVED" } });
+
+    const mundialSections = [
+      ["HAI", "Haiti", 20],
+      ["ECU", "Ecuador", 20],
+      ["ARG", "Argentina", 20],
+      ["BRA", "Brasil", 20],
+      ["FRA", "Francia", 20],
+      ["ESP", "Espana", 20],
+      ["MEX", "Mexico", 20],
+      ["USA", "Estados Unidos", 20],
+      ["CAN", "Canada", 20],
+      ["GEN", "General", 40]
+    ] as const;
+    const totalStickers = mundialSections.reduce((sum, section) => sum + section[2], 0);
 
     const album = await tx.album.create({
       data: {
         name: "Mundial 2026",
         description: "Album comunitario inicial para intercambiar cromos del Mundial 2026 en Cuenca.",
-        totalStickers: 640,
-        isActive: true
+        totalStickers,
+        isActive: true,
+        status: "ACTIVE"
       }
     });
 
-    const stickers = Array.from({ length: album.totalStickers }, (_, index) => {
-      const number = index + 1;
-      const section = number <= 40 ? "Intro" : `Equipo ${Math.ceil((number - 40) / 20)}`;
-      return {
+    const stickers = mundialSections.flatMap(([code, section, count]) =>
+      Array.from({ length: count }, (_, index) => ({
         albumId: album.id,
-        number,
+        code,
+        number: index + 1,
         section,
-        name: `Cromo ${number}`,
-        rarity: number % 50 === 0 ? "Especial" : null
-      };
-    });
+        name: `${code} ${index + 1}`,
+        rarity: index + 1 === count ? "Especial" : null
+      }))
+    );
 
     await tx.sticker.createMany({ data: stickers, skipDuplicates: true });
 

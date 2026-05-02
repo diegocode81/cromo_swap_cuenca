@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-type Sticker = { id: string; number: number; name: string; section: string };
+type Sticker = { id: string; number: number; code: string; name: string; section: string };
 type Entry = { id: string; status: "HAVE" | "REPEATED" | "MISSING"; quantity: number; sticker: Sticker };
 
 const labels = { HAVE: "Tengo", REPEATED: "Repetido", MISSING: "Me falta" };
@@ -27,6 +27,7 @@ export function InventoryManager({
       if (!q) return true;
       return (
         String(sticker.number).includes(q) ||
+        sticker.code.toLowerCase().includes(q) ||
         sticker.name.toLowerCase().includes(q) ||
         sticker.section.toLowerCase().includes(q)
       );
@@ -94,7 +95,8 @@ export function InventoryManager({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold text-slate-500">{sticker.section}</p>
-                  <h2 className="text-lg font-black">#{sticker.number} {sticker.name}</h2>
+                  <h2 className="text-lg font-black">{sticker.code} {sticker.number}</h2>
+                  <p className="text-sm text-slate-600">{sticker.name}</p>
                 </div>
                 {entry ? <span className="rounded-full bg-sky px-3 py-1 text-xs font-bold">{labels[entry.status]}</span> : null}
               </div>

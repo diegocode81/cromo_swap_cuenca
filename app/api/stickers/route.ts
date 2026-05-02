@@ -13,6 +13,7 @@ export async function GET(request: Request) {
     const search = q
       ? [
           ...(/^\d+$/.test(q) ? [{ number: Number(q) }] : []),
+          { code: { contains: q, mode: "insensitive" as const } },
           { section: { contains: q, mode: "insensitive" as const } },
           { name: { contains: q, mode: "insensitive" as const } }
         ]
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
         albumId: resolvedAlbumId,
         ...(search ? { OR: search } : {})
       },
-      orderBy: { number: "asc" },
+      orderBy: [{ code: "asc" }, { number: "asc" }],
       take: q ? 100 : 800
     });
     return json({ stickers });

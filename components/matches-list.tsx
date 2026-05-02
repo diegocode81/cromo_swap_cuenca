@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-type StickerInfo = { id: string; number: number; name: string; section: string };
+type StickerInfo = { id: string; number: number; code: string; name: string; section: string };
 type Match = {
   id: string;
   score: number;
@@ -50,11 +50,11 @@ export function MatchesList({ matches, currentUserId }: { matches: Match[]; curr
             </div>
             <div>
               <p className="label">Te puede dar</p>
-              <p className="text-sm">{givesMe.length ? givesMe.map((s) => `#${s.number}`).join(", ") : "Sin cromos en esta direccion"}</p>
+              <p className="text-sm">{givesMe.length ? givesMe.map((s) => `${s.code} ${s.number}`).join(", ") : "Sin cromos en esta direccion"}</p>
             </div>
             <div>
               <p className="label">Tu puedes dar</p>
-              <p className="text-sm">{iGive.length ? iGive.map((s) => `#${s.number}`).join(", ") : "Sin cromos en esta direccion"}</p>
+              <p className="text-sm">{iGive.length ? iGive.map((s) => `${s.code} ${s.number}`).join(", ") : "Sin cromos en esta direccion"}</p>
             </div>
             <button className="btn-primary w-full" onClick={() => startChat(match.id)}>
               Enviar mensaje

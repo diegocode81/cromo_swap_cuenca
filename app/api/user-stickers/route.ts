@@ -16,7 +16,7 @@ export async function GET(request: Request) {
         ...(status ? { status: status as "HAVE" | "REPEATED" | "MISSING" } : {})
       },
       include: { sticker: true },
-      orderBy: { sticker: { number: "asc" } }
+      orderBy: [{ sticker: { code: "asc" } }, { sticker: { number: "asc" } }]
     });
     return json({ entries, album });
   } catch {

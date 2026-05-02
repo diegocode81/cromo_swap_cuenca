@@ -11,6 +11,7 @@ export async function POST() {
       data: Array.from({ length: album.totalStickers }, (_, index) => ({
         albumId: album.id,
         number: index + 1,
+        code: "GEN",
         section: "General",
         name: `Cromo ${index + 1}`
       })),

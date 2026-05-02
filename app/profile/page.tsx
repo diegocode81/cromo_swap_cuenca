@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function ProfilePage() {
   const user = await requireUser();
-  const album = await prisma.album.findFirst({ where: { isActive: true } });
+  const album = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
   const [registered, repeated, missing, matches, unreadMessages] = await Promise.all([
     album ? prisma.userSticker.count({ where: { userId: user.id, albumId: album.id } }) : 0,
     album ? prisma.userSticker.count({ where: { userId: user.id, albumId: album.id, status: "REPEATED" } }) : 0,

@@ -42,10 +42,22 @@ npm run prisma:seed
 El seed crea:
 
 - Album activo `Mundial 2026`
-- Catalogo inicial de 640 cromos
+- Catalogo inicial parametrizado por secciones/equipos
 - Usuario admin `admin@cromoswap.ec` con contrasena `Admin12345!`
 
 Cambia esa contrasena despues del primer acceso.
+
+## Gestion de albumes
+
+El administrador puede crear albumes en borrador desde `/admin/albums` y activarlos cuando esten listos para usuarios. El catalogo se parametriza por secciones con este formato, una linea por seccion:
+
+```text
+HAI,Haiti,20
+ECU,Ecuador,20
+GEN,General,40
+```
+
+Cada codigo reinicia su numeracion desde 1, por ejemplo `HAI 1`, `HAI 2`, `ECU 1`. Al activar un album, el album activo anterior pasa a historico. Al eliminar un album se borran sus cromos, inventarios, matches, conversaciones, mensajes y reportes relacionados; las cuentas de usuario se conservan.
 
 ## Desarrollo
 

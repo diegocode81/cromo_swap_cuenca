@@ -19,15 +19,32 @@ export const profileSchema = z.object({
   zone: z.enum(CUENCA_ZONES)
 });
 
-export const albumSchema = z.object({
-  name: z.string().min(2).max(120),
-  description: z.string().min(3).max(500),
-  totalStickers: z.coerce.number().int().min(1).max(2000)
-});
+export const albumSchema = z
+  .object({
+    name: z.string().min(2).max(120),
+    description: z.string().min(3).max(500),
+    totalStickers: z.coerce.number().int().min(1).max(3000).optional(),
+    sections: z
+      .array(
+        z.object({
+          code: z.string().trim().min(2).max(8).transform((value) => value.toUpperCase()),
+          name: z.string().trim().min(2).max(120),
+          count: z.coerce.number().int().min(1).max(300)
+        })
+      )
+      .min(1)
+      .max(120)
+      .optional()
+  })
+  .refine((data) => Boolean(data.totalStickers || data.sections?.length), {
+    message: "Debes ingresar secciones o cantidad total de cromos",
+    path: ["sections"]
+  });
 
 export const stickerSchema = z.object({
   albumId: z.string().optional(),
   number: z.coerce.number().int().positive(),
+  code: z.string().trim().min(2).max(8).transform((value) => value.toUpperCase()).default("GEN"),
   section: z.string().min(1).max(80),
   name: z.string().min(1).max(120),
   rarity: z.string().max(40).optional().nullable()

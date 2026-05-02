@@ -33,6 +33,12 @@ enum ReportStatus {
   DISMISSED
 }
 
+enum AlbumStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
 model User {
   id           String          @id @default(cuid())
   name         String
@@ -62,6 +68,7 @@ model Album {
   description   String
   totalStickers Int
   isActive      Boolean         @default(false)
+  status        AlbumStatus     @default(DRAFT)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   stickers      Sticker[]
@@ -70,12 +77,14 @@ model Album {
   conversations Conversation[]
 
   @@index([isActive])
+  @@index([status])
 }
 
 model Sticker {
   id           String        @id @default(cuid())
   albumId      String
   number       Int
+  code         String        @default("GEN")
   section      String
   name         String
   rarity       String?
@@ -84,7 +93,8 @@ model Sticker {
   album        Album         @relation(fields: [albumId], references: [id], onDelete: Cascade)
   userStickers UserSticker[]
 
-  @@unique([albumId, number])
+  @@unique([albumId, code, number])
+  @@index([albumId, code, number])
   @@index([albumId, section])
 }
 

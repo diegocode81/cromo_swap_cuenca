@@ -5,6 +5,7 @@ type AgentPrisma = PrismaClient;
 type StickerInfo = {
   id: string;
   number: number;
+  code: string;
   name: string;
   section: string;
 };
@@ -34,7 +35,7 @@ function scoreMatch(aToB: StickerInfo[], bToA: StickerInfo[], sameZone: boolean)
 
 export async function runExchangeAgent(prisma: AgentPrisma): Promise<ExchangeAgentResult> {
   const logs: string[] = [];
-  const activeAlbum = await prisma.album.findFirst({ where: { isActive: true } });
+  const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
 
   if (!activeAlbum) {
     logs.push("No active album found. Agent stopped.");
@@ -68,6 +69,7 @@ export async function runExchangeAgent(prisma: AgentPrisma): Promise<ExchangeAge
           {
             id: entry.stickerId,
             number: entry.sticker.number,
+            code: entry.sticker.code,
             name: entry.sticker.name,
             section: entry.sticker.section
           }
@@ -81,6 +83,7 @@ export async function runExchangeAgent(prisma: AgentPrisma): Promise<ExchangeAge
           {
             id: entry.stickerId,
             number: entry.sticker.number,
+            code: entry.sticker.code,
             name: entry.sticker.name,
             section: entry.sticker.section
           }

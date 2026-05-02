@@ -1,4 +1,4 @@
-import { RestartSeasonForm, ToggleAlbumButton } from "@/components/admin-actions";
+import { DeleteAlbumButton, RestartSeasonForm, ToggleAlbumButton } from "@/components/admin-actions";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -22,14 +22,15 @@ export default async function AdminAlbumsPage() {
                 <p className="text-sm text-slate-600">{album.description}</p>
               </div>
               <span className={`rounded-full px-3 py-1 text-xs font-bold ${album.isActive ? "bg-field text-white" : "bg-slate-100"}`}>
-                {album.isActive ? "Activo" : "Historico"}
+                {album.status}
               </span>
             </div>
             <p className="mt-3 text-sm text-slate-600">
               {album.totalStickers} cromos · {album._count.matches} matches · {album._count.userStickers} registros
             </p>
-            <div className="mt-3">
+            <div className="mt-3 flex flex-wrap gap-2">
               <ToggleAlbumButton albumId={album.id} isActive={album.isActive} />
+              <DeleteAlbumButton albumId={album.id} albumName={album.name} />
             </div>
           </article>
         ))}

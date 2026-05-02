@@ -6,7 +6,7 @@ import { profileSchema } from "@/lib/validators";
 export async function GET() {
   try {
     const user = await requireUser();
-    const activeAlbum = await prisma.album.findFirst({ where: { isActive: true } });
+    const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
     const [registered, repeated, missing, matches, unreadMessages] = await Promise.all([
       activeAlbum
         ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id } })
