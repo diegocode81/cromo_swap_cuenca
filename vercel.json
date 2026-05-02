@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/exchange-agent",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

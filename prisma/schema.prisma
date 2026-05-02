@@ -1,0 +1,178 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum StickerStatus {
+  HAVE
+  REPEATED
+  MISSING
+}
+
+enum MatchStatus {
+  SUGGESTED
+  DISMISSED
+  ARCHIVED
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  DISMISSED
+}
+
+model User {
+  id           String          @id @default(cuid())
+  name         String
+  email        String          @unique
+  passwordHash String
+  city         String          @default("Cuenca")
+  zone         String
+  role         Role            @default(USER)
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  stickers     UserSticker[]
+  matchesAsA   ExchangeMatch[] @relation("MatchUserA")
+  matchesAsB   ExchangeMatch[] @relation("MatchUserB")
+  chatsAsA      Conversation[]  @relation("ConversationUserA")
+  chatsAsB      Conversation[]  @relation("ConversationUserB")
+  messages     Message[]
+  reportsMade  Report[]        @relation("ReportsMade")
+  reportsGot   Report[]        @relation("ReportsGot")
+
+  @@index([city, zone])
+}
+
+model Album {
+  id            String          @id @default(cuid())
+  name          String
+  description   String
+  totalStickers Int
+  isActive      Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  stickers      Sticker[]
+  userStickers  UserSticker[]
+  matches       ExchangeMatch[]
+  conversations Conversation[]
+
+  @@index([isActive])
+}
+
+model Sticker {
+  id           String        @id @default(cuid())
+  albumId      String
+  number       Int
+  section      String
+  name         String
+  rarity       String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  album        Album         @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  userStickers UserSticker[]
+
+  @@unique([albumId, number])
+  @@index([albumId, section])
+}
+
+model UserSticker {
+  id        String        @id @default(cuid())
+  userId    String
+  albumId   String
+  stickerId String
+  status    StickerStatus
+  quantity  Int           @default(1)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  album     Album         @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  sticker   Sticker       @relation(fields: [stickerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, stickerId])
+  @@index([userId, albumId, status])
+  @@index([albumId, stickerId, status])
+}
+
+model ExchangeMatch {
+  id                String        @id @default(cuid())
+  albumId           String
+  userAId           String
+  userBId           String
+  stickersFromAToB  Json
+  stickersFromBToA  Json
+  score             Int
+  status            MatchStatus   @default(SUGGESTED)
+  lastCheckedAt     DateTime      @default(now())
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  album             Album         @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  userA             User          @relation("MatchUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB             User          @relation("MatchUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  conversations     Conversation[]
+
+  @@unique([albumId, userAId, userBId])
+  @@index([albumId, score])
+}
+
+model Conversation {
+  id              String         @id @default(cuid())
+  albumId         String?
+  exchangeMatchId String?
+  userAId         String
+  userBId         String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  album           Album?         @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  exchangeMatch   ExchangeMatch? @relation(fields: [exchangeMatchId], references: [id], onDelete: SetNull)
+  userA           User           @relation("ConversationUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB           User           @relation("ConversationUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  messages        Message[]
+  reports         Report[]
+
+  @@unique([userAId, userBId, exchangeMatchId])
+  @@index([userAId, updatedAt])
+  @@index([userBId, updatedAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+model Report {
+  id             String        @id @default(cuid())
+  reporterId     String
+  reportedUserId String
+  conversationId String?
+  reason         String
+  status         ReportStatus  @default(OPEN)
+  createdAt      DateTime      @default(now())
+  reporter       User          @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUser   User          @relation("ReportsGot", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([reportedUserId])
+}

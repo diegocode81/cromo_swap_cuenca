@@ -1,0 +1,18 @@
+import Link from "next/link";
+import { LoginForm } from "@/components/auth-forms";
+
+export default function LoginPage() {
+  return (
+    <section className="py-8">
+      <h1 className="mb-2 text-center text-3xl font-black">Iniciar sesion</h1>
+      <p className="mb-6 text-center text-slate-600">Entra para gestionar tus cromos y matches.</p>
+      <LoginForm />
+      <p className="mt-5 text-center text-sm">
+        No tienes cuenta?{" "}
+        <Link href="/register" className="font-semibold text-field">
+          Crear cuenta
+        </Link>
+      </p>
+    </section>
+  );
+}
