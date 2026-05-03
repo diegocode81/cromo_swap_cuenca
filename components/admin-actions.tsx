@@ -223,32 +223,64 @@ export function ToggleUserButton({ userId, isActive }: { userId: string; isActiv
 
 export function AdminPasswordForm({ userId }: { userId: string }) {
   const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setMessage("Actualizando...");
-    const form = new FormData(event.currentTarget);
-    const password = String(form.get("password") ?? "");
-    const response = await fetch(`/api/admin/users/${userId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password })
-    });
+    if (isSaving) return;
 
-    if (response.ok) {
-      event.currentTarget.reset();
-      setMessage("Contrasena actualizada.");
+    const form = new FormData(event.currentTarget);
+    const password = String(form.get("password") ?? "").trim();
+    if (password.length < 8) {
+      setMessage("La contrasena debe tener minimo 8 caracteres.");
       return;
     }
 
-    setMessage("No se pudo actualizar. Minimo 8 caracteres.");
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
+
+    setIsSaving(true);
+    setMessage("Actualizando...");
+
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+        signal: controller.signal
+      });
+
+      if (response.ok) {
+        event.currentTarget.reset();
+        setMessage("Contrasena actualizada correctamente.");
+        return;
+      }
+
+      const data = await response.json().catch(() => ({}));
+      setMessage(data.error ?? "No se pudo actualizar la contrasena.");
+    } catch (error) {
+      setMessage(
+        error instanceof DOMException && error.name === "AbortError"
+          ? "La solicitud tardo demasiado. Intenta nuevamente."
+          : "No se pudo conectar con el servidor."
+      );
+    } finally {
+      window.clearTimeout(timeoutId);
+      setIsSaving(false);
+    }
   }
 
   return (
     <form onSubmit={onSubmit} className="grid gap-2 sm:grid-cols-[1fr_auto]">
       <PasswordInput name="password" minLength={8} maxLength={80} placeholder="Nueva contrasena" required />
-      <button className="btn-secondary py-2" type="submit">Cambiar</button>
-      {message ? <p className="text-sm text-slate-600 sm:col-span-2">{message}</p> : null}
+      <button className="btn-secondary py-2 disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={isSaving}>
+        {isSaving ? "Guardando" : "Cambiar"}
+      </button>
+      {message ? (
+        <p className={`text-sm sm:col-span-2 ${message.includes("correctamente") ? "text-field" : "text-slate-600"}`}>
+          {message}
+        </p>
+      ) : null}
     </form>
   );
 }
