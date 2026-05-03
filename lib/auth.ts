@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getServerSession } from "next-auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, withPrismaRetry } from "@/lib/prisma";
 import { loginSchema } from "@/lib/validators";
 
 export const authOptions: NextAuthOptions = {
@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+        const user = await withPrismaRetry(() => prisma.user.findUnique({ where: { email: parsed.data.email } }));
         if (!user || !user.isActive) return null;
 
         const validPassword = await bcrypt.compare(parsed.data.password, user.passwordHash);
@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
 export async function getCurrentUser() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
-  return prisma.user.findUnique({ where: { id: session.user.id } });
+  return withPrismaRetry(() => prisma.user.findUnique({ where: { id: session.user.id } }));
 }
 
 export async function requireUser() {
