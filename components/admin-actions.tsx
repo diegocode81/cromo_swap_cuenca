@@ -220,6 +220,38 @@ export function ToggleUserButton({ userId, isActive }: { userId: string; isActiv
   return <button className="btn-secondary py-2" onClick={toggle}>{active ? "Desactivar" : "Activar"}</button>;
 }
 
+export function AdminPasswordForm({ userId }: { userId: string }) {
+  const [message, setMessage] = useState("");
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage("Actualizando...");
+    const form = new FormData(event.currentTarget);
+    const password = String(form.get("password") ?? "");
+    const response = await fetch(`/api/admin/users/${userId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+
+    if (response.ok) {
+      event.currentTarget.reset();
+      setMessage("Contrasena actualizada.");
+      return;
+    }
+
+    setMessage("No se pudo actualizar. Minimo 8 caracteres.");
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="grid gap-2 sm:grid-cols-[1fr_auto]">
+      <input name="password" type="password" minLength={8} maxLength={80} placeholder="Nueva contrasena" required />
+      <button className="btn-secondary py-2" type="submit">Cambiar</button>
+      {message ? <p className="text-sm text-slate-600 sm:col-span-2">{message}</p> : null}
+    </form>
+  );
+}
+
 export function ToggleAlbumButton({ albumId, isActive }: { albumId: string; isActive: boolean }) {
   const [active, setActive] = useState(isActive);
   async function toggle() {
