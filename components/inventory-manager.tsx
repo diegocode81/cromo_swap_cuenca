@@ -89,7 +89,7 @@ export function InventoryManager({
     const nextQuantity = Math.max(0, currentQuantity + delta);
 
     if (nextQuantity === 0) {
-      if (current?.status === "REPEATED") await remove(current.id);
+      if (current?.status === "REPEATED") await mark(stickerId, "HAVE");
       return;
     }
 
