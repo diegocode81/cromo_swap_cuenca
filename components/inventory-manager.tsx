@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 type Sticker = { id: string; number: number; code: string; name: string; section: string };
 type Entry = { id: string; status: "HAVE" | "REPEATED" | "MISSING"; quantity: number; sticker: Sticker };
 
-const labels = { HAVE: "Tengo", REPEATED: "Repetido", MISSING: "Me falta" };
+const labels = { HAVE: "Tengo", REPEATED: "Repetido", MISSING: "Sin registrar" };
 
 export function InventoryManager({
   stickers,
@@ -18,7 +18,7 @@ export function InventoryManager({
 }) {
   const [entries, setEntries] = useState<Entry[]>(initialEntries);
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<"ALL" | "HAVE" | "REPEATED" | "MISSING">(defaultStatus ?? "ALL");
+  const [filter, setFilter] = useState<"ALL" | "HAVE" | "REPEATED">(defaultStatus === "MISSING" ? "ALL" : defaultStatus ?? "ALL");
 
   const entryBySticker = useMemo(() => new Map(entries.map((entry) => [entry.sticker.id, entry])), [entries]);
   const visibleStickers = stickers
@@ -47,6 +47,30 @@ export function InventoryManager({
         stickerId,
         status,
         quantity: status === "REPEATED" ? Math.max(2, current?.quantity ?? 2) : 1
+      })
+    });
+    if (!response.ok) return;
+    const data = (await response.json()) as { entry: Entry };
+    setEntries((prev) => [data.entry, ...prev.filter((entry) => entry.id !== data.entry.id)]);
+  }
+
+  async function adjustRepeated(stickerId: string, delta: number) {
+    const current = entryBySticker.get(stickerId);
+    const currentQuantity = current?.status === "REPEATED" ? current.quantity : 0;
+    const nextQuantity = Math.max(0, currentQuantity + delta);
+
+    if (nextQuantity === 0) {
+      if (current?.status === "REPEATED") await remove(current.id);
+      return;
+    }
+
+    const response = await fetch("/api/user-stickers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stickerId,
+        status: "REPEATED",
+        quantity: nextQuantity
       })
     });
     if (!response.ok) return;
@@ -83,7 +107,6 @@ export function InventoryManager({
           <option value="ALL">Todos</option>
           <option value="HAVE">Tengo</option>
           <option value="REPEATED">Repetidos</option>
-          <option value="MISSING">Faltantes</option>
         </select>
       </div>
 
@@ -96,14 +119,27 @@ export function InventoryManager({
                 <div>
                   <p className="text-xs font-semibold text-slate-500">{sticker.section}</p>
                   <h2 className="text-lg font-black">{sticker.code} {sticker.number}</h2>
-                  <p className="text-sm text-slate-600">{sticker.name}</p>
+                  {sticker.name !== sticker.section ? <p className="text-sm text-slate-600">{sticker.name}</p> : null}
                 </div>
                 {entry ? <span className="rounded-full bg-sky px-3 py-1 text-xs font-bold">{labels[entry.status]}</span> : null}
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-2">
                 <button className="btn-secondary px-2 py-2" onClick={() => mark(sticker.id, "HAVE")}>Tengo</button>
-                <button className="btn-secondary px-2 py-2" onClick={() => mark(sticker.id, "REPEATED")}>Repetido</button>
-                <button className="btn-secondary px-2 py-2" onClick={() => mark(sticker.id, "MISSING")}>Me falta</button>
+                <div className="grid grid-cols-[44px_1fr_44px] overflow-hidden rounded-lg border border-slate-200 bg-white">
+                  <button
+                    className="text-lg font-black disabled:opacity-40"
+                    disabled={entry?.status !== "REPEATED"}
+                    onClick={() => adjustRepeated(sticker.id, -1)}
+                  >
+                    -
+                  </button>
+                  <button className="border-x border-slate-200 px-2 py-2 text-sm font-bold" onClick={() => adjustRepeated(sticker.id, 1)}>
+                    Repetido {entry?.status === "REPEATED" ? `(${entry.quantity})` : ""}
+                  </button>
+                  <button className="text-lg font-black" onClick={() => adjustRepeated(sticker.id, 1)}>
+                    +
+                  </button>
+                </div>
               </div>
               {entry ? (
                 <button className="mt-3 text-sm font-semibold text-red-600" onClick={() => remove(entry.id)}>

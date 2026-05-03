@@ -39,7 +39,7 @@ export function buildStickerCatalog(data: AlbumInput, albumId: string) {
       code: section.code,
       section: section.name,
       number: index + 1,
-      name: `${section.code} ${index + 1}`
+      name: section.name
     }))
   );
 }
