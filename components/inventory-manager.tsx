@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 type Sticker = { id: string; number: number; code: string; name: string; section: string };
 type Entry = { id: string; status: "HAVE" | "REPEATED" | "MISSING"; quantity: number; sticker: Sticker };
-type Filter = "ALL" | "MISSING" | "REPEATED";
+type Filter = "ALL" | "HAVE" | "MISSING" | "REPEATED";
 type ReportType = "REPEATED" | "MISSING";
 
 const labels = { HAVE: "Tengo", REPEATED: "Repetido", MISSING: "Sin registrar" };
@@ -68,7 +68,7 @@ export function InventoryManager({
 }) {
   const [entries, setEntries] = useState<Entry[]>(initialEntries);
   const [query, setQuery] = useState("");
-  const initialFilter: Filter = defaultStatus === "REPEATED" || defaultStatus === "MISSING" ? defaultStatus : "ALL";
+  const initialFilter: Filter = defaultStatus === "HAVE" || defaultStatus === "REPEATED" || defaultStatus === "MISSING" ? defaultStatus : "ALL";
   const [filter, setFilter] = useState<Filter>(initialFilter);
 
   const entryBySticker = useMemo(() => new Map(entries.map((entry) => [entry.sticker.id, entry])), [entries]);
@@ -86,6 +86,7 @@ export function InventoryManager({
     .filter((sticker) => {
       const entry = entryBySticker.get(sticker.id);
       if (filter === "ALL") return true;
+      if (filter === "HAVE") return entry?.status === "HAVE" || entry?.status === "REPEATED";
       if (filter === "MISSING") return entry?.status !== "HAVE" && entry?.status !== "REPEATED";
       return entry?.status === "REPEATED";
     })
@@ -291,6 +292,7 @@ export function InventoryManager({
               onChange={(event) => setFilter(event.target.value as Filter)}
             >
               <option value="ALL">Todos</option>
+              <option value="HAVE">Tengo</option>
               <option value="MISSING">Faltantes</option>
               <option value="REPEATED">Repetidos</option>
             </select>
