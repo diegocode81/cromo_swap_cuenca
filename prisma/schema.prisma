@@ -45,7 +45,6 @@ model User {
   email               String               @unique
   passwordHash        String
   city                String               @default("Cuenca")
-  zone                String
   role                Role                 @default(USER)
   isActive            Boolean              @default(true)
   createdAt           DateTime             @default(now())
@@ -60,7 +59,7 @@ model User {
   reportsGot          Report[]             @relation("ReportsGot")
   passwordResetTokens PasswordResetToken[]
 
-  @@index([city, zone])
+  @@index([city])
 }
 
 model PasswordResetToken {

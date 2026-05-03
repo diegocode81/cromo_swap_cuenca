@@ -13,7 +13,6 @@ type StickerInfo = {
 type UserInventory = {
   id: string;
   name: string;
-  zone: string;
   repeated: Map<string, StickerInfo>;
   missing: Map<string, StickerInfo>;
 };
@@ -26,11 +25,10 @@ export type ExchangeAgentResult = {
   logs: string[];
 };
 
-function scoreMatch(aToB: StickerInfo[], bToA: StickerInfo[], sameZone: boolean) {
+function scoreMatch(aToB: StickerInfo[], bToA: StickerInfo[]) {
   const usefulBothWays = aToB.length + bToA.length;
   const reciprocalBonus = aToB.length > 0 && bToA.length > 0 ? 25 : 0;
-  const zoneBonus = sameZone ? 10 : 0;
-  return Math.min(100, usefulBothWays * 8 + reciprocalBonus + zoneBonus);
+  return Math.min(100, usefulBothWays * 8 + reciprocalBonus);
 }
 
 export async function runExchangeAgent(prisma: AgentPrisma): Promise<ExchangeAgentResult> {
@@ -49,7 +47,6 @@ export async function runExchangeAgent(prisma: AgentPrisma): Promise<ExchangeAge
     select: {
       id: true,
       name: true,
-      zone: true,
       stickers: {
         where: { albumId: activeAlbum.id, status: { in: ["REPEATED", "MISSING"] } },
         include: { sticker: true }
@@ -60,7 +57,6 @@ export async function runExchangeAgent(prisma: AgentPrisma): Promise<ExchangeAge
   const inventories: UserInventory[] = users.map((user) => ({
     id: user.id,
     name: user.name,
-    zone: user.zone,
     repeated: new Map(
       user.stickers
         .filter((entry) => entry.status === "REPEATED" && entry.quantity > 0)
@@ -108,7 +104,7 @@ export async function runExchangeAgent(prisma: AgentPrisma): Promise<ExchangeAge
 
       if (stickersFromAToB.length === 0 && stickersFromBToA.length === 0) continue;
 
-      const score = scoreMatch(stickersFromAToB, stickersFromBToA, userA.zone === userB.zone);
+      const score = scoreMatch(stickersFromAToB, stickersFromBToA);
       validKeys.add(`${userA.id}:${userB.id}`);
 
       await prisma.exchangeMatch.upsert({

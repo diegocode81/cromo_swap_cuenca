@@ -18,7 +18,7 @@ export default async function AdminUsersPage({
         OR: [
           { name: { contains: q, mode: "insensitive" } },
           { email: { contains: q, mode: "insensitive" } },
-          { zone: { contains: q, mode: "insensitive" } }
+          { city: { contains: q, mode: "insensitive" } }
         ]
       }
     : {};
@@ -33,7 +33,6 @@ export default async function AdminUsersPage({
         name: true,
         email: true,
         city: true,
-        zone: true,
         role: true,
         isActive: true,
         _count: { select: { stickers: true, messages: true, reportsGot: true } }
@@ -51,7 +50,7 @@ export default async function AdminUsersPage({
         <p className="text-sm text-slate-600">{total} usuarios encontrados · pagina {page} de {totalPages}</p>
       </div>
       <form className="card grid gap-3 sm:grid-cols-[1fr_auto]" action="/admin/users">
-        <input name="q" defaultValue={q} placeholder="Buscar por nombre, email o zona" />
+        <input name="q" defaultValue={q} placeholder="Buscar por nombre, email o ciudad" />
         <button className="btn-primary" type="submit">Buscar</button>
       </form>
       <div className="grid gap-3 lg:grid-cols-2">
@@ -61,7 +60,7 @@ export default async function AdminUsersPage({
               <div>
                 <h2 className="text-lg font-black">{user.name}</h2>
                 <p className="text-sm text-slate-600">{user.email}</p>
-                <p className="text-sm text-slate-600">{user.city} · {user.zone} · {user.role}</p>
+                <p className="text-sm text-slate-600">{user.city} · {user.role}</p>
                 <p className="mt-1 text-xs text-slate-500">
                   {user._count.stickers} cromos · {user._count.messages} mensajes · {user._count.reportsGot} reportes
                 </p>

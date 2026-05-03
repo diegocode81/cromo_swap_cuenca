@@ -38,7 +38,7 @@ export async function GET() {
     ]);
 
     return json({
-      user: { id: user.id, name: user.name, email: user.email, city: user.city, zone: user.zone, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, city: user.city, role: user.role },
       stats: { registered, repeated, missing, matches, unreadMessages },
       activeAlbum
     });
@@ -54,7 +54,7 @@ export async function PATCH(request: Request) {
     const updated = await prisma.user.update({
       where: { id: user.id },
       data,
-      select: { id: true, name: true, email: true, city: true, zone: true, role: true }
+      select: { id: true, name: true, email: true, city: true, role: true }
     });
     return json({ user: updated });
   } catch (error) {

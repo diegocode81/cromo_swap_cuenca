@@ -10,8 +10,8 @@ type Match = {
   userBId: string;
   stickersFromAToB: StickerInfo[];
   stickersFromBToA: StickerInfo[];
-  userA: { id: string; name: string; zone: string };
-  userB: { id: string; name: string; zone: string };
+  userA: { id: string; name: string; city: string };
+  userB: { id: string; name: string; city: string };
   album: { name: string };
 };
 
@@ -44,7 +44,7 @@ export function MatchesList({ matches, currentUserId }: { matches: Match[]; curr
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-xl font-black">{other.name}</h2>
-                <p className="text-sm text-slate-600">{other.zone} · {match.album.name}</p>
+                <p className="text-sm text-slate-600">{other.city} · {match.album.name}</p>
               </div>
               <span className="rounded-full bg-field px-3 py-1 text-sm font-black text-white">{match.score}%</span>
             </div>

@@ -9,7 +9,6 @@ declare module "next-auth" {
       email?: string | null;
       role: "USER" | "ADMIN";
       city: string;
-      zone: string;
       isActive: boolean;
     };
   }
@@ -17,7 +16,6 @@ declare module "next-auth" {
   interface User {
     role?: string;
     city?: string;
-    zone?: string;
     isActive?: boolean;
   }
 }
@@ -27,7 +25,6 @@ declare module "next-auth/jwt" {
     id?: string;
     role?: string;
     city?: string;
-    zone?: string;
     isActive?: boolean;
   }
 }

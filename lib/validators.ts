@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { CITY, CUENCA_ZONES } from "@/lib/zones";
+import { CITY } from "@/lib/zones";
 
 export const registerSchema = z.object({
   name: z.string().min(2).max(80),
   email: z.string().email().max(160).toLowerCase(),
   password: z.string().min(8).max(80),
-  city: z.literal(CITY),
-  zone: z.enum(CUENCA_ZONES)
+  city: z.literal(CITY)
 });
 
 export const loginSchema = z.object({
@@ -30,8 +29,7 @@ export const resetPasswordSchema = z
   });
 
 export const profileSchema = z.object({
-  name: z.string().min(2).max(80),
-  zone: z.enum(CUENCA_ZONES)
+  name: z.string().min(2).max(80)
 });
 
 export const albumSchema = z

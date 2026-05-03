@@ -1,9 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { CUENCA_ZONES } from "@/lib/zones";
 
-export function ProfileForm({ user }: { user: { name: string; email: string; city: string; zone: string } }) {
+export function ProfileForm({ user }: { user: { name: string; email: string; city: string } }) {
   const [saved, setSaved] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -12,7 +11,7 @@ export function ProfileForm({ user }: { user: { name: string; email: string; cit
     const response = await fetch("/api/users/me", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: form.get("name"), zone: form.get("zone") })
+      body: JSON.stringify({ name: form.get("name") })
     });
     setSaved(response.ok);
   }
@@ -30,14 +29,6 @@ export function ProfileForm({ user }: { user: { name: string; email: string; cit
       <div>
         <label className="label">Ciudad</label>
         <input value={user.city} readOnly />
-      </div>
-      <div>
-        <label className="label">Zona</label>
-        <select name="zone" defaultValue={user.zone}>
-          {CUENCA_ZONES.map((zone) => (
-            <option key={zone} value={zone}>{zone}</option>
-          ))}
-        </select>
       </div>
       {saved ? <p className="text-sm font-semibold text-field">Perfil actualizado.</p> : null}
       <button className="btn-primary" type="submit">Guardar cambios</button>

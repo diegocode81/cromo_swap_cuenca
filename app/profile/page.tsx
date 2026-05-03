@@ -28,7 +28,7 @@ export default async function ProfilePage() {
         <StatCard label="Matches" value={matches} />
         <StatCard label="Mensajes pendientes" value={unreadMessages} />
       </div>
-      <ProfileForm user={{ name: user.name, email: user.email, city: user.city, zone: user.zone }} />
+      <ProfileForm user={{ name: user.name, email: user.email, city: user.city }} />
     </section>
   );
 }

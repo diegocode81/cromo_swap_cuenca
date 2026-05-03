@@ -11,8 +11,8 @@ export async function GET() {
       where: { OR: [{ userAId: user.id }, { userBId: user.id }] },
       include: {
         album: true,
-        userA: { select: { id: true, name: true, zone: true } },
-        userB: { select: { id: true, name: true, zone: true } },
+        userA: { select: { id: true, name: true, city: true } },
+        userB: { select: { id: true, name: true, city: true } },
         messages: { orderBy: { createdAt: "desc" }, take: 1 }
       },
       orderBy: { updatedAt: "desc" }

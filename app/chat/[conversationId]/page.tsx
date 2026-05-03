@@ -16,7 +16,7 @@ export default async function ConversationPage({ params }: { params: { conversat
     <section className="space-y-4">
       <div>
         <h1 className="text-2xl font-black">{other.name}</h1>
-        <p className="text-sm text-slate-600">{other.zone}</p>
+        <p className="text-sm text-slate-600">{other.city}</p>
       </div>
       <ChatClient conversationId={conversation.id} currentUserId={user.id} reportedUserId={other.id} />
     </section>

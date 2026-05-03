@@ -10,8 +10,8 @@ export default async function MatchesPage() {
     where: { albumId: album.id, status: "SUGGESTED", OR: [{ userAId: user.id }, { userBId: user.id }] },
     include: {
       album: { select: { name: true } },
-      userA: { select: { id: true, name: true, zone: true } },
-      userB: { select: { id: true, name: true, zone: true } }
+      userA: { select: { id: true, name: true, city: true } },
+      userB: { select: { id: true, name: true, city: true } }
     },
     orderBy: [{ score: "desc" }, { updatedAt: "desc" }]
   });

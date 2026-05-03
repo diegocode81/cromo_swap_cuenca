@@ -7,8 +7,8 @@ export default async function ChatPage() {
   const conversations = await prisma.conversation.findMany({
     where: { OR: [{ userAId: user.id }, { userBId: user.id }] },
     include: {
-      userA: { select: { id: true, name: true, zone: true } },
-      userB: { select: { id: true, name: true, zone: true } },
+      userA: { select: { id: true, name: true, city: true } },
+      userB: { select: { id: true, name: true, city: true } },
       messages: { orderBy: { createdAt: "desc" }, take: 1 }
     },
     orderBy: { updatedAt: "desc" }
@@ -23,7 +23,7 @@ export default async function ChatPage() {
           return (
             <Link key={conversation.id} href={`/chat/${conversation.id}`} className="card block">
               <h2 className="text-lg font-black">{other.name}</h2>
-              <p className="text-sm text-slate-600">{other.zone}</p>
+              <p className="text-sm text-slate-600">{other.city}</p>
               <p className="mt-2 truncate text-sm">{conversation.messages[0]?.content ?? "Sin mensajes todavia"}</p>
             </Link>
           );

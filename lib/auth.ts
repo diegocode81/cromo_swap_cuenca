@@ -30,7 +30,6 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           email: user.email,
           role: user.role,
-          zone: user.zone,
           city: user.city,
           isActive: user.isActive
         };
@@ -42,7 +41,6 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as { role: string }).role;
-        token.zone = (user as { zone: string }).zone;
         token.city = (user as { city: string }).city;
         token.isActive = (user as { isActive: boolean }).isActive;
       }
@@ -52,7 +50,6 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as "USER" | "ADMIN";
-        session.user.zone = token.zone as string;
         session.user.city = token.city as string;
         session.user.isActive = token.isActive as boolean;
       }

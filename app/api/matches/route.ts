@@ -15,8 +15,8 @@ export async function GET() {
       },
       include: {
         album: true,
-        userA: { select: { id: true, name: true, zone: true, city: true } },
-        userB: { select: { id: true, name: true, zone: true, city: true } }
+        userA: { select: { id: true, name: true, city: true } },
+        userB: { select: { id: true, name: true, city: true } }
       },
       orderBy: [{ score: "desc" }, { updatedAt: "desc" }]
     });

@@ -23,5 +23,5 @@ export type StickerPayload = {
 };
 
 export function publicUserSelect() {
-  return { id: true, name: true, city: true, zone: true, createdAt: true };
+  return { id: true, name: true, city: true, createdAt: true };
 }

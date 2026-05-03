@@ -5,7 +5,6 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { PasswordInput } from "@/components/password-input";
-import { CUENCA_ZONES } from "@/lib/zones";
 
 export function LoginForm() {
   const router = useRouter();
@@ -157,8 +156,7 @@ export function RegisterForm() {
         name: form.get("name"),
         email: form.get("email"),
         password: form.get("password"),
-        city: "Cuenca",
-        zone: form.get("zone")
+        city: "Cuenca"
       })
     });
     if (!response.ok) {
@@ -190,16 +188,6 @@ export function RegisterForm() {
       <div>
         <label className="label">Ciudad</label>
         <input value="Cuenca" readOnly />
-      </div>
-      <div>
-        <label className="label">Zona de Cuenca</label>
-        <select name="zone" required defaultValue="Centro Historico">
-          {CUENCA_ZONES.map((zone) => (
-            <option key={zone} value={zone}>
-              {zone}
-            </option>
-          ))}
-        </select>
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <button className="btn-primary w-full" type="submit">

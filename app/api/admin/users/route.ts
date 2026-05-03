@@ -15,7 +15,7 @@ export async function GET(request: Request) {
           OR: [
             { name: { contains: q, mode: "insensitive" } },
             { email: { contains: q, mode: "insensitive" } },
-            { zone: { contains: q, mode: "insensitive" } }
+            { city: { contains: q, mode: "insensitive" } }
           ]
         }
       : {};
@@ -28,7 +28,6 @@ export async function GET(request: Request) {
           name: true,
           email: true,
           city: true,
-          zone: true,
           role: true,
           isActive: true,
           createdAt: true,

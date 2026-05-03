@@ -52,7 +52,6 @@ async function main() {
         email: "admin@cromoswap.ec",
         passwordHash: await bcrypt.hash("Admin12345!", 12),
         city: "Cuenca",
-        zone: "Centro Historico",
         role: "ADMIN"
       }
     });
