@@ -37,6 +37,15 @@ function TrashIcon() {
   );
 }
 
+function SearchIcon() {
+  return (
+    <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 20 20" fill="none">
+      <path d="m14.5 14.5 2.5 2.5" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+      <circle cx="8.8" cy="8.8" r="5.6" stroke="currentColor" strokeWidth="1.9" />
+    </svg>
+  );
+}
+
 export function InventoryManager({
   stickers,
   initialEntries,
@@ -121,26 +130,46 @@ export function InventoryManager({
 
   return (
     <div className="space-y-4">
-      <div className="card">
-        <div className="mb-3 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-slate-500">Progreso del album activo</p>
-            <p className="text-2xl font-black text-field">{progress}%</p>
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_14px_34px_rgba(15,23,42,0.08)] sm:p-5">
+        <div className="grid gap-5 md:grid-cols-[220px_1fr] md:items-center">
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-slate-50/80 p-4 text-center">
+            <p className="mb-3 text-sm font-bold text-slate-500">Progreso del album</p>
+            <div
+              className="grid h-32 w-32 place-items-center rounded-full transition-all duration-700 ease-out"
+              style={{
+                background: `conic-gradient(#2f855f ${progress * 3.6}deg, #e5e7eb 0deg)`
+              }}
+            >
+              <div className="grid h-24 w-24 place-items-center rounded-full bg-white shadow-inner">
+                <span className="text-3xl font-black text-field">{progress}%</span>
+              </div>
+            </div>
+            <p className="mt-3 text-sm font-black text-ink">{owned}/{stickers.length}</p>
           </div>
-          <p className="text-sm font-semibold">{owned}/{stickers.length}</p>
-        </div>
-        <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full bg-field" style={{ width: `${progress}%` }} />
-        </div>
-      </div>
 
-      <div className="card grid gap-3 md:grid-cols-[1fr_auto]">
-        <input placeholder="Buscar por numero, seccion o nombre" value={query} onChange={(event) => setQuery(event.target.value)} />
-        <select value={filter} onChange={(event) => setFilter(event.target.value as Filter)}>
-          <option value="ALL">Todos</option>
-          <option value="MISSING">Faltantes</option>
-          <option value="REPEATED">Repetidos</option>
-        </select>
+          <div className="grid gap-3">
+            <label className="relative block">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                <SearchIcon />
+              </span>
+              <input
+                className="rounded-2xl border-slate-200 bg-slate-50 py-4 pl-12 pr-4 text-base shadow-sm transition hover:bg-white focus:border-blue-300 focus:bg-white focus:ring-blue-100"
+                placeholder="Buscar por numero, seccion o nombre"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </label>
+            <select
+              className="max-w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-4 text-base font-bold text-ink shadow-sm transition hover:bg-white focus:border-blue-300 focus:bg-white focus:ring-blue-100 md:max-w-[220px]"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value as Filter)}
+            >
+              <option value="ALL">Todos</option>
+              <option value="MISSING">Faltantes</option>
+              <option value="REPEATED">Repetidos</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
