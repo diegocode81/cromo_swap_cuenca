@@ -54,6 +54,7 @@ export async function AlbumScreen({ defaultStatus }: { defaultStatus?: "HAVE" | 
         <p className="text-slate-600">{album.description}</p>
       </div>
       <InventoryManager
+        userName={user.name || user.email || "Usuario"}
         stickers={stickers.map((sticker) => ({
           id: sticker.id,
           number: sticker.number,

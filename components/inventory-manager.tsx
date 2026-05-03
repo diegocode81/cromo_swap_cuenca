@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 type Sticker = { id: string; number: number; code: string; name: string; section: string };
 type Entry = { id: string; status: "HAVE" | "REPEATED" | "MISSING"; quantity: number; sticker: Sticker };
 type Filter = "ALL" | "MISSING" | "REPEATED";
+type ReportType = "REPEATED" | "MISSING";
 
 const labels = { HAVE: "Tengo", REPEATED: "Repetido", MISSING: "Sin registrar" };
 
@@ -46,11 +47,32 @@ function SearchIcon() {
   );
 }
 
+function PrintIcon() {
+  return (
+    <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 20 20" fill="none">
+      <path d="M6 7V3.8h8V7" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M6 14.2H4.5A1.5 1.5 0 0 1 3 12.7V8.5A1.5 1.5 0 0 1 4.5 7h11A1.5 1.5 0 0 1 17 8.5v4.2a1.5 1.5 0 0 1-1.5 1.5H14" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      <path d="M6.5 11.5h7v4.7h-7v-4.7Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 export function InventoryManager({
+  userName,
   stickers,
   initialEntries,
   defaultStatus
 }: {
+  userName: string;
   stickers: Sticker[];
   initialEntries: Entry[];
   defaultStatus?: "HAVE" | "REPEATED" | "MISSING";
@@ -127,6 +149,90 @@ export function InventoryManager({
 
   const owned = entries.filter((entry) => entry.status === "HAVE" || entry.status === "REPEATED").length;
   const progress = stickers.length ? Math.round((owned / stickers.length) * 100) : 0;
+  const repeatedEntries = entries
+    .filter((entry) => entry.status === "REPEATED" && entry.quantity > 0)
+    .sort((a, b) => a.sticker.code.localeCompare(b.sticker.code) || a.sticker.number - b.sticker.number);
+  const missingStickers = stickers.filter((sticker) => {
+    const entry = entryBySticker.get(sticker.id);
+    return entry?.status !== "HAVE" && entry?.status !== "REPEATED";
+  });
+
+  function printSummary(type: ReportType) {
+    const printedAt = new Intl.DateTimeFormat("es-EC", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }).format(new Date());
+    const isRepeated = type === "REPEATED";
+    const title = isRepeated ? "Resumen de cromos repetidos" : "Resumen de cromos faltantes";
+    const rows = isRepeated
+      ? repeatedEntries.map(
+          (entry, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${escapeHtml(`${entry.sticker.code} ${entry.sticker.number}`)}</td>
+              <td>${escapeHtml(entry.sticker.section)}</td>
+              <td>${entry.quantity}</td>
+            </tr>`
+        )
+      : missingStickers.map(
+          (sticker, index) => `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${escapeHtml(`${sticker.code} ${sticker.number}`)}</td>
+              <td>${escapeHtml(sticker.section)}</td>
+            </tr>`
+        );
+    const emptyMessage = isRepeated ? "No tienes cromos repetidos registrados." : "No tienes cromos faltantes registrados.";
+    const tableHeaders = isRepeated ? "<th>#</th><th>Codigo</th><th>Pais / seccion</th><th>Repetidos</th>" : "<th>#</th><th>Codigo</th><th>Pais / seccion</th>";
+    const reportWindow = window.open("", "_blank", "width=900,height=700");
+    if (!reportWindow) return;
+
+    reportWindow.document.write(`
+      <!doctype html>
+      <html>
+        <head>
+          <title>${escapeHtml(title)}</title>
+          <style>
+            @page { size: A4; margin: 18mm; }
+            body { background: #fff; color: #111827; font-family: Arial, sans-serif; margin: 0; padding: 32px; }
+            h1 { font-size: 18px; margin: 0 0 6px; }
+            h2 { font-size: 28px; margin: 0 0 24px; }
+            p { margin: 6px 0; }
+            .meta { margin-bottom: 24px; color: #374151; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #d1d5db; padding: 10px 12px; text-align: left; }
+            th { background: #f3f4f6; font-weight: 700; }
+            .empty { border: 1px solid #d1d5db; padding: 16px; }
+          </style>
+        </head>
+        <body>
+          <h1>CromoSwap Cuenca</h1>
+          <h2>${escapeHtml(title)}</h2>
+          <div class="meta">
+            <p><strong>Fecha:</strong> ${escapeHtml(printedAt)}</p>
+            <p><strong>Usuario:</strong> ${escapeHtml(userName || "Usuario")}</p>
+          </div>
+          <p><strong>Lista de cromos:</strong></p>
+          ${
+            rows.length > 0
+              ? `<table><thead><tr>${tableHeaders}</tr></thead><tbody>${rows.join("")}</tbody></table>`
+              : `<p class="empty">${escapeHtml(emptyMessage)}</p>`
+          }
+          <script>
+            window.onload = function () {
+              window.focus();
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    reportWindow.document.close();
+  }
 
   return (
     <div className="space-y-4">
@@ -169,6 +275,25 @@ export function InventoryManager({
               <option value="REPEATED">Repetidos</option>
             </select>
           </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+          <p className="text-sm font-bold text-slate-500">Repetidos</p>
+          <p className="mt-1 text-3xl font-black text-ink">{repeatedEntries.length}</p>
+          <button className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100" onClick={() => printSummary("REPEATED")}>
+            <PrintIcon />
+            Imprimir resumen
+          </button>
+        </div>
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+          <p className="text-sm font-bold text-slate-500">Faltantes</p>
+          <p className="mt-1 text-3xl font-black text-ink">{missingStickers.length}</p>
+          <button className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100" onClick={() => printSummary("MISSING")}>
+            <PrintIcon />
+            Imprimir resumen
+          </button>
         </div>
       </div>
 
