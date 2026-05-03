@@ -53,6 +53,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         });
       }
       const status = data.status ?? (data.isActive === false ? "ARCHIVED" : undefined);
+      const shouldDeactivate = status === "DRAFT" || status === "ARCHIVED" || data.isActive === false;
       if (shouldReplaceCatalog) {
         if (hasCommunityData) {
           await clearAlbumCommunityData(tx, params.id);
@@ -69,7 +70,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
           ...(shouldReplaceCatalog ? { totalStickers: totalFromSections(data) } : {}),
           ...(status ? { status } : {}),
           ...(shouldActivate ? { isActive: true } : {}),
-          ...(data.isActive === false ? { isActive: false } : {})
+          ...(shouldDeactivate ? { isActive: false } : {})
         }
       });
     });

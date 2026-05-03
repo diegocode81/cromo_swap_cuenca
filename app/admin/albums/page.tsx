@@ -23,6 +23,7 @@ export default async function AdminAlbumsPage() {
 
     return {
       ...album,
+      isEffectivelyActive: album.status === "ACTIVE" && album.isActive,
       hasCommunityData: album._count.userStickers + album._count.matches + album._count.conversations > 0,
       sectionsText: Array.from(sectionCounts.values())
         .map((section) => `${section.code},${section.section},${section.count}`)
@@ -42,7 +43,7 @@ export default async function AdminAlbumsPage() {
                 <h2 className="text-xl font-black">{album.name}</h2>
                 <p className="text-sm text-slate-600">{album.description}</p>
               </div>
-              <span className={`rounded-full px-3 py-1 text-xs font-bold ${album.isActive ? "bg-field text-white" : "bg-slate-100"}`}>
+              <span className={`rounded-full px-3 py-1 text-xs font-bold ${album.isEffectivelyActive ? "bg-field text-white" : "bg-slate-100"}`}>
                 {album.status}
               </span>
             </div>
@@ -50,7 +51,7 @@ export default async function AdminAlbumsPage() {
               {album.totalStickers} cromos · {album._count.matches} matches · {album._count.userStickers} registros
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <ToggleAlbumButton albumId={album.id} isActive={album.isActive} />
+              <ToggleAlbumButton albumId={album.id} isActive={album.isEffectivelyActive} />
               <DeleteAlbumButton albumId={album.id} albumName={album.name} />
             </div>
             <EditAlbumForm

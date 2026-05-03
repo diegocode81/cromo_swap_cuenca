@@ -1,11 +1,42 @@
 import { InventoryManager } from "@/components/inventory-manager";
 import { requireUser } from "@/lib/auth";
-import { requireActiveAlbum } from "@/lib/domain";
+import { getActiveAlbum } from "@/lib/domain";
 import { prisma } from "@/lib/prisma";
 
 export async function AlbumScreen({ defaultStatus }: { defaultStatus?: "HAVE" | "REPEATED" | "MISSING" }) {
   const user = await requireUser();
-  const album = await requireActiveAlbum();
+  const album = await getActiveAlbum();
+  if (!album) {
+    const draftAlbums = await prisma.album.findMany({
+      where: { status: "DRAFT" },
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { stickers: true } } }
+    });
+
+    return (
+      <section className="space-y-4">
+        <div className="card">
+          <h1 className="text-3xl font-black">Sin album activo</h1>
+          <p className="mt-2 text-slate-600">
+            El administrador esta preparando el catalogo. Cuando active un album, podras registrar tus cromos aqui.
+          </p>
+        </div>
+        {draftAlbums.length > 0 ? (
+          <div className="card">
+            <h2 className="text-xl font-black">Albumes en preparacion</h2>
+            <div className="mt-3 grid gap-2">
+              {draftAlbums.map((draftAlbum) => (
+                <div key={draftAlbum.id} className="rounded-lg border border-slate-200 p-3">
+                  <p className="font-bold">{draftAlbum.name}</p>
+                  <p className="text-sm text-slate-600">{draftAlbum._count.stickers} cromos cargados</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </section>
+    );
+  }
   const [stickers, entries, historicalAlbums] = await Promise.all([
     prisma.sticker.findMany({ where: { albumId: album.id }, orderBy: [{ code: "asc" }, { number: "asc" }] }),
     prisma.userSticker.findMany({ where: { userId: user.id, albumId: album.id }, include: { sticker: true } }),
