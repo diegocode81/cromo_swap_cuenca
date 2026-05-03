@@ -2,6 +2,20 @@
 
 import { FormEvent, useState } from "react";
 
+type AlbumStatus = "DRAFT" | "ACTIVE" | "ARCHIVED";
+
+function parseSections(raw: FormDataEntryValue | null) {
+  return String(raw ?? "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [code, name, count] = line.split(",").map((part) => part.trim());
+      return { code, name, count: Number(count) };
+    })
+    .filter((section) => section.code && section.name && Number.isFinite(section.count) && section.count > 0);
+}
+
 export function RunAgentButton() {
   const [message, setMessage] = useState("");
   async function run() {
@@ -20,18 +34,6 @@ export function RunAgentButton() {
 
 export function RestartSeasonForm() {
   const [message, setMessage] = useState("");
-
-  function parseSections(raw: FormDataEntryValue | null) {
-    return String(raw ?? "")
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => {
-        const [code, name, count] = line.split(",").map((part) => part.trim());
-        return { code, name, count: Number(count) };
-      })
-      .filter((section) => section.code && section.name && Number.isFinite(section.count) && section.count > 0);
-  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -94,6 +96,117 @@ export function RestartSeasonForm() {
   );
 }
 
+export function EditAlbumForm({
+  album
+}: {
+  album: {
+    id: string;
+    name: string;
+    description: string;
+    status: AlbumStatus;
+    totalStickers: number;
+    sectionsText: string;
+    hasCommunityData: boolean;
+  };
+}) {
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<AlbumStatus>(album.status);
+
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage("Guardando...");
+    const form = new FormData(event.currentTarget);
+    const nextStatus = String(form.get("status")) as AlbumStatus;
+    const sections = parseSections(form.get("sections"));
+
+    if (nextStatus === "ACTIVE" && status !== "ACTIVE") {
+      const confirmed = window.confirm("Al activar este album, se desactivara el album activo actual.");
+      if (!confirmed) {
+        setMessage("");
+        return;
+      }
+    }
+
+    const payload = {
+      name: form.get("name"),
+      description: form.get("description"),
+      status: nextStatus,
+      ...(album.hasCommunityData
+        ? {}
+        : {
+            totalStickers: form.get("totalStickers") || undefined,
+            sections: sections.length > 0 ? sections : undefined
+          })
+    };
+
+    const response = await fetch(`/api/admin/albums/${album.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      setMessage(data.error ?? "No se pudo actualizar el album.");
+      return;
+    }
+
+    setStatus(nextStatus);
+    setMessage("Album actualizado.");
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="mt-4 space-y-3 rounded-lg border border-slate-200 p-3">
+      <div className="grid gap-3 md:grid-cols-2">
+        <div>
+          <label className="label">Nombre</label>
+          <input name="name" defaultValue={album.name} required />
+        </div>
+        <div>
+          <label className="label">Estado</label>
+          <select name="status" defaultValue={status}>
+            <option value="DRAFT">Borrador</option>
+            <option value="ACTIVE">Activo para usuarios</option>
+            <option value="ARCHIVED">Archivado</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label className="label">Descripcion</label>
+        <textarea name="description" defaultValue={album.description} required />
+      </div>
+      <div>
+        <label className="label">Secciones</label>
+        <textarea
+          name="sections"
+          rows={5}
+          defaultValue={album.sectionsText}
+          disabled={album.hasCommunityData}
+          placeholder={"HAI,Haiti,20\nECU,Ecuador,20"}
+        />
+      </div>
+      <div>
+        <label className="label">Cantidad total si no usas secciones</label>
+        <input
+          name="totalStickers"
+          type="number"
+          min={1}
+          defaultValue={album.totalStickers}
+          disabled={album.hasCommunityData}
+        />
+      </div>
+      {album.hasCommunityData ? (
+        <p className="text-sm text-slate-600">
+          El catalogo no se puede regenerar porque ya existen inventarios, matches o chats. Si necesitas cambiarlo,
+          crea otro album o elimina este album.
+        </p>
+      ) : null}
+      <button className="btn-primary" type="submit">Guardar album</button>
+      {message ? <p className="text-sm font-semibold text-field">{message}</p> : null}
+    </form>
+  );
+}
+
 export function ToggleUserButton({ userId, isActive }: { userId: string; isActive: boolean }) {
   const [active, setActive] = useState(isActive);
   async function toggle() {
@@ -126,18 +239,30 @@ export function ToggleAlbumButton({ albumId, isActive }: { albumId: string; isAc
 
 export function DeleteAlbumButton({ albumId, albumName }: { albumId: string; albumName: string }) {
   const [deleted, setDeleted] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function remove() {
     const confirmed = window.confirm(
-      `Eliminar ${albumName}? Se borraran cromos, inventarios, matches, chats y reportes relacionados con este album.`
+      `Eliminar ${albumName}? Se borraran cromos, inventarios, matches, chats, mensajes y reportes relacionados con este album. Tambien se eliminaran cuentas USER que solo tengan actividad en este album.`
     );
     if (!confirmed) return;
     const response = await fetch(`/api/admin/albums/${albumId}`, { method: "DELETE" });
-    if (response.ok) setDeleted(true);
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      setDeleted(true);
+      setMessage(`Album eliminado. Usuarios exclusivos eliminados: ${data.deletedUsers ?? 0}.`);
+    } else {
+      setMessage(data.error ?? "No se pudo eliminar el album.");
+    }
   }
 
-  if (deleted) return <p className="text-sm font-semibold text-red-600">Album eliminado.</p>;
-  return <button className="btn-secondary py-2 text-red-700" onClick={remove}>Eliminar album</button>;
+  if (deleted) return <p className="text-sm font-semibold text-red-600">{message}</p>;
+  return (
+    <div>
+      <button className="btn-secondary py-2 text-red-700" onClick={remove}>Eliminar album</button>
+      {message ? <p className="mt-2 text-sm text-red-600">{message}</p> : null}
+    </div>
+  );
 }
 
 export function ReportStatusSelect({ reportId, status }: { reportId: string; status: string }) {

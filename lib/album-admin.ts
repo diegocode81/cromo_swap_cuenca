@@ -1,8 +1,8 @@
 import type { Prisma } from "@prisma/client";
 
 type AlbumInput = {
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
   totalStickers?: number;
   sections?: { code: string; name: string; count: number }[];
 };
@@ -31,14 +31,44 @@ export function totalFromSections(data: AlbumInput) {
   return data.totalStickers ?? 1;
 }
 
+export async function albumHasCommunityData(tx: Prisma.TransactionClient, albumId: string) {
+  const [inventories, matches, conversations] = await Promise.all([
+    tx.userSticker.count({ where: { albumId } }),
+    tx.exchangeMatch.count({ where: { albumId } }),
+    tx.conversation.count({ where: { OR: [{ albumId }, { exchangeMatch: { albumId } }] } })
+  ]);
+
+  return inventories + matches + conversations > 0;
+}
+
 export async function deleteAlbumGraph(tx: Prisma.TransactionClient, albumId: string) {
+  const albumUsers = await tx.userSticker.findMany({
+    where: { albumId },
+    select: { userId: true },
+    distinct: ["userId"]
+  });
+  const albumMatches = await tx.exchangeMatch.findMany({
+    where: { albumId },
+    select: { userAId: true, userBId: true }
+  });
   const conversations = await tx.conversation.findMany({
     where: {
       OR: [{ albumId }, { exchangeMatch: { albumId } }]
     },
-    select: { id: true }
+    select: { id: true, userAId: true, userBId: true }
   });
   const conversationIds = conversations.map((conversation) => conversation.id);
+  const candidateUserIds = new Set<string>();
+
+  albumUsers.forEach((entry) => candidateUserIds.add(entry.userId));
+  albumMatches.forEach((match) => {
+    candidateUserIds.add(match.userAId);
+    candidateUserIds.add(match.userBId);
+  });
+  conversations.forEach((conversation) => {
+    candidateUserIds.add(conversation.userAId);
+    candidateUserIds.add(conversation.userBId);
+  });
 
   if (conversationIds.length > 0) {
     await tx.report.deleteMany({ where: { conversationId: { in: conversationIds } } });
@@ -50,4 +80,28 @@ export async function deleteAlbumGraph(tx: Prisma.TransactionClient, albumId: st
   await tx.userSticker.deleteMany({ where: { albumId } });
   await tx.sticker.deleteMany({ where: { albumId } });
   await tx.album.delete({ where: { id: albumId } });
+
+  let deletedUsers = 0;
+  for (const userId of candidateUserIds) {
+    const remaining = await tx.user.findFirst({
+      where: {
+        id: userId,
+        role: "USER",
+        stickers: { none: {} },
+        matchesAsA: { none: {} },
+        matchesAsB: { none: {} },
+        chatsAsA: { none: {} },
+        chatsAsB: { none: {} },
+        messages: { none: {} }
+      },
+      select: { id: true }
+    });
+
+    if (remaining) {
+      await tx.user.delete({ where: { id: userId } });
+      deletedUsers += 1;
+    }
+  }
+
+  return { deletedUsers };
 }

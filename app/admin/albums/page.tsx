@@ -1,12 +1,33 @@
-import { DeleteAlbumButton, RestartSeasonForm, ToggleAlbumButton } from "@/components/admin-actions";
+import { DeleteAlbumButton, EditAlbumForm, RestartSeasonForm, ToggleAlbumButton } from "@/components/admin-actions";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminAlbumsPage() {
   await requireAdmin();
   const albums = await prisma.album.findMany({
-    include: { _count: { select: { stickers: true, matches: true, userStickers: true } } },
+    include: {
+      stickers: { select: { code: true, section: true }, orderBy: [{ code: "asc" }, { number: "asc" }] },
+      _count: { select: { stickers: true, matches: true, userStickers: true, conversations: true } }
+    },
     orderBy: { createdAt: "desc" }
+  });
+
+  const viewAlbums = albums.map((album) => {
+    const sectionCounts = new Map<string, { code: string; section: string; count: number }>();
+    album.stickers.forEach((sticker) => {
+      const key = `${sticker.code}:${sticker.section}`;
+      const current = sectionCounts.get(key) ?? { code: sticker.code, section: sticker.section, count: 0 };
+      current.count += 1;
+      sectionCounts.set(key, current);
+    });
+
+    return {
+      ...album,
+      hasCommunityData: album._count.userStickers + album._count.matches + album._count.conversations > 0,
+      sectionsText: Array.from(sectionCounts.values())
+        .map((section) => `${section.code},${section.section},${section.count}`)
+        .join("\n")
+    };
   });
 
   return (
@@ -14,7 +35,7 @@ export default async function AdminAlbumsPage() {
       <h1 className="text-3xl font-black">Albumes</h1>
       <RestartSeasonForm />
       <div className="grid gap-3">
-        {albums.map((album) => (
+        {viewAlbums.map((album) => (
           <article key={album.id} className="card">
             <div className="flex items-start justify-between gap-3">
               <div>
@@ -32,6 +53,17 @@ export default async function AdminAlbumsPage() {
               <ToggleAlbumButton albumId={album.id} isActive={album.isActive} />
               <DeleteAlbumButton albumId={album.id} albumName={album.name} />
             </div>
+            <EditAlbumForm
+              album={{
+                id: album.id,
+                name: album.name,
+                description: album.description,
+                status: album.status,
+                totalStickers: album.totalStickers,
+                sectionsText: album.sectionsText,
+                hasCommunityData: album.hasCommunityData
+              }}
+            />
           </article>
         ))}
       </div>
