@@ -120,6 +120,8 @@ export function InventoryManager({
 
   async function adjustRepeated(stickerId: string, delta: number) {
     const current = entryBySticker.get(stickerId);
+    if (!current || (current.status !== "HAVE" && current.status !== "REPEATED")) return;
+
     const currentQuantity = current?.status === "REPEATED" ? current.quantity : 0;
     const nextQuantity = Math.max(0, currentQuantity + delta);
 
@@ -324,6 +326,7 @@ export function InventoryManager({
         {visibleStickers.map((sticker) => {
           const entry = entryBySticker.get(sticker.id);
           const hasSticker = entry?.status === "HAVE" || entry?.status === "REPEATED";
+          const canEditRepeated = hasSticker;
           const repeatedQuantity = entry?.status === "REPEATED" ? entry.quantity : 0;
           return (
             <article key={sticker.id} className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_14px_34px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] sm:p-5">
@@ -350,17 +353,20 @@ export function InventoryManager({
 
               <div className="my-5 h-px bg-slate-200" />
 
-              <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+              <div
+                className={`flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 ${canEditRepeated ? "" : "cursor-not-allowed opacity-60"}`}
+                title={canEditRepeated ? "Cromos repetidos" : "Marca Tengo para agregar repetidos"}
+              >
                 <div className="flex min-w-0 items-center gap-1 text-xs font-semibold text-slate-600">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center text-blue-600">
+                  <span className={`grid h-6 w-6 shrink-0 place-items-center ${canEditRepeated ? "text-blue-600" : "text-slate-400"}`}>
                     <StackIcon />
                   </span>
                   <span className="whitespace-nowrap">Rep.</span>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
                   <button
-                    className="grid h-8 w-8 place-items-center rounded-lg border border-blue-200 bg-white text-sm font-bold leading-none text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-300"
-                    disabled={entry?.status !== "REPEATED"}
+                    className="grid h-8 w-8 place-items-center rounded-lg border border-blue-200 bg-white text-sm font-bold leading-none text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+                    disabled={!canEditRepeated || repeatedQuantity === 0}
                     onClick={() => adjustRepeated(sticker.id, -1)}
                     aria-label={`Restar repetido de ${sticker.code} ${sticker.number}`}
                   >
@@ -370,7 +376,8 @@ export function InventoryManager({
                     {repeatedQuantity}
                   </span>
                   <button
-                    className="grid h-8 w-8 place-items-center rounded-lg border border-blue-200 bg-white text-sm font-bold leading-none text-blue-600 transition hover:bg-blue-50"
+                    className="grid h-8 w-8 place-items-center rounded-lg border border-blue-200 bg-white text-sm font-bold leading-none text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+                    disabled={!canEditRepeated}
                     onClick={() => adjustRepeated(sticker.id, 1)}
                     aria-label={`Sumar repetido de ${sticker.code} ${sticker.number}`}
                   >

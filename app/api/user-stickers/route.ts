@@ -32,6 +32,13 @@ export async function POST(request: Request) {
     const sticker = await prisma.sticker.findFirst({ where: { id: data.stickerId, albumId: album.id } });
     if (!sticker) return json({ error: "Cromo no pertenece al album activo" }, { status: 400 });
 
+    const existing = await prisma.userSticker.findUnique({
+      where: { userId_stickerId: { userId: user.id, stickerId: data.stickerId } }
+    });
+    if (data.status === "REPEATED" && (!existing || existing.status === "MISSING")) {
+      return json({ error: "Marca Tengo antes de agregar repetidos" }, { status: 400 });
+    }
+
     const quantity = data.status === "REPEATED" ? data.quantity : 1;
     const entry = await prisma.userSticker.upsert({
       where: { userId_stickerId: { userId: user.id, stickerId: data.stickerId } },
