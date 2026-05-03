@@ -1,5 +1,11 @@
 import { requireAdmin } from "@/lib/auth";
-import { albumHasCommunityData, buildStickerCatalog, deleteAlbumGraph, totalFromSections } from "@/lib/album-admin";
+import {
+  albumHasCommunityData,
+  buildStickerCatalog,
+  clearAlbumCommunityData,
+  deleteAlbumGraph,
+  totalFromSections
+} from "@/lib/album-admin";
 import { badRequest, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
@@ -32,8 +38,12 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     const shouldActivate = data.status === "ACTIVE" || data.isActive === true;
     const shouldReplaceCatalog = Boolean(data.sections?.length || data.totalStickers);
     const album = await prisma.$transaction(async (tx) => {
-      if (shouldReplaceCatalog && (await albumHasCommunityData(tx, params.id))) {
-        throw new Error("No puedes cambiar el catalogo porque el album ya tiene inventarios, matches o chats.");
+      const currentAlbum = await tx.album.findUnique({ where: { id: params.id }, select: { status: true } });
+      if (!currentAlbum) throw new Error("Album no encontrado");
+
+      const hasCommunityData = shouldReplaceCatalog ? await albumHasCommunityData(tx, params.id) : false;
+      if (shouldReplaceCatalog && hasCommunityData && currentAlbum.status !== "DRAFT") {
+        throw new Error("Solo puedes regenerar el catalogo con datos existentes si el album esta en borrador.");
       }
 
       if (shouldActivate) {
@@ -44,6 +54,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       }
       const status = data.status ?? (data.isActive === false ? "ARCHIVED" : undefined);
       if (shouldReplaceCatalog) {
+        if (hasCommunityData) {
+          await clearAlbumCommunityData(tx, params.id);
+        }
         await tx.sticker.deleteMany({ where: { albumId: params.id } });
         await tx.sticker.createMany({ data: buildStickerCatalog(data, params.id) });
       }

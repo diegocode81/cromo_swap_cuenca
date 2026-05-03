@@ -109,6 +109,7 @@ export function EditAlbumForm({
     totalStickers: number;
     sectionsText: string;
     hasCommunityData: boolean;
+    canRegenerateCatalog: boolean;
   };
 }) {
   const [message, setMessage] = useState("");
@@ -134,7 +135,12 @@ export function EditAlbumForm({
       description: form.get("description"),
       status: nextStatus,
       ...(album.hasCommunityData
-        ? {}
+        ? album.canRegenerateCatalog
+          ? {
+              totalStickers: form.get("totalStickers") || undefined,
+              sections: sections.length > 0 ? sections : undefined
+            }
+          : {}
         : {
             totalStickers: form.get("totalStickers") || undefined,
             sections: sections.length > 0 ? sections : undefined
@@ -183,7 +189,7 @@ export function EditAlbumForm({
           name="sections"
           rows={5}
           defaultValue={album.sectionsText}
-          disabled={album.hasCommunityData}
+          disabled={!album.canRegenerateCatalog}
           placeholder={"HAI,Haiti,20\nECU,Ecuador,20"}
         />
       </div>
@@ -194,13 +200,18 @@ export function EditAlbumForm({
           type="number"
           min={1}
           defaultValue={album.totalStickers}
-          disabled={album.hasCommunityData}
+          disabled={!album.canRegenerateCatalog}
         />
       </div>
-      {album.hasCommunityData ? (
+      {album.hasCommunityData && album.canRegenerateCatalog ? (
         <p className="text-sm text-slate-600">
-          El catalogo no se puede regenerar porque ya existen inventarios, matches o chats. Si necesitas cambiarlo,
-          crea otro album o elimina este album.
+          Como el album esta en borrador, al guardar se limpiaran inventarios, matches y chats de este album antes de
+          regenerar el catalogo.
+        </p>
+      ) : null}
+      {album.hasCommunityData && !album.canRegenerateCatalog ? (
+        <p className="text-sm text-slate-600">
+          El catalogo solo se puede regenerar con datos existentes cuando el album esta en borrador.
         </p>
       ) : null}
       <button className="btn-primary" type="submit">Guardar album</button>

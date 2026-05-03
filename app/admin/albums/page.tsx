@@ -61,7 +61,8 @@ export default async function AdminAlbumsPage() {
                 status: album.status,
                 totalStickers: album.totalStickers,
                 sectionsText: album.sectionsText,
-                hasCommunityData: album.hasCommunityData
+                hasCommunityData: album.hasCommunityData,
+                canRegenerateCatalog: album.status === "DRAFT" || !album.hasCommunityData
               }}
             />
           </article>
