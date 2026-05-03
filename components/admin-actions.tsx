@@ -240,10 +240,12 @@ export function AdminPasswordForm({ userId }: { userId: string }) {
     setMessage("Actualizando...");
 
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
+      const response = await fetch(`/api/admin/users/${userId}/password`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ password }),
+        cache: "no-store",
+        credentials: "same-origin"
       });
 
       if (response.ok) {
