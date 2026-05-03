@@ -168,7 +168,7 @@ export function InventoryManager({
     }).format(new Date());
     const isRepeated = type === "REPEATED";
     const title = isRepeated ? "Resumen de cromos repetidos" : "Resumen de cromos faltantes";
-    const rows = isRepeated
+    const rows: string[] = isRepeated
       ? repeatedEntries.map(
           (entry, index) => `
             <tr>
@@ -187,7 +187,21 @@ export function InventoryManager({
             </tr>`
         );
     const emptyMessage = isRepeated ? "No tienes cromos repetidos registrados." : "No tienes cromos faltantes registrados.";
-    const tableHeaders = isRepeated ? "<th>#</th><th>Codigo</th><th>Pais / seccion</th><th>Repetidos</th>" : "<th>#</th><th>Codigo</th><th>Pais / seccion</th>";
+    const tableHeaders = isRepeated ? "<th>#</th><th>Codigo</th><th>Pais / seccion</th><th>Rep.</th>" : "<th>#</th><th>Codigo</th><th>Pais / seccion</th>";
+    const pages = Array.from({ length: Math.ceil(rows.length / 80) }, (_, index) => rows.slice(index * 80, index * 80 + 80));
+    const tables = pages
+      .map((pageRows) => {
+        const leftRows = pageRows.slice(0, 40);
+        const rightRows = pageRows.slice(40, 80);
+        return `
+          <div class="print-page">
+            <div class="print-columns">
+              <table class="print-table"><thead><tr>${tableHeaders}</tr></thead><tbody>${leftRows.join("")}</tbody></table>
+              ${rightRows.length > 0 ? `<table class="print-table"><thead><tr>${tableHeaders}</tr></thead><tbody>${rightRows.join("")}</tbody></table>` : "<div></div>"}
+            </div>
+          </div>`;
+      })
+      .join("");
     const reportWindow = window.open("", "_blank", "width=900,height=700");
     if (!reportWindow) return;
 
@@ -197,31 +211,35 @@ export function InventoryManager({
         <head>
           <title>${escapeHtml(title)}</title>
           <style>
-            @page { size: A4; margin: 18mm; }
-            body { background: #fff; color: #111827; font-family: Arial, sans-serif; margin: 0; padding: 32px; }
-            h1 { font-size: 18px; margin: 0 0 6px; }
-            h2 { font-size: 28px; margin: 0 0 24px; }
-            p { margin: 6px 0; }
-            .meta { margin-bottom: 24px; color: #374151; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid #d1d5db; padding: 10px 12px; text-align: left; }
-            th { background: #f3f4f6; font-weight: 700; }
-            .empty { border: 1px solid #d1d5db; padding: 16px; }
+            @page { size: A4 portrait; margin: 8mm; }
+            * { box-sizing: border-box; }
+            body { background: #fff; color: #000; font-family: Arial, sans-serif; font-size: 8px; margin: 0; padding: 8mm; }
+            .print-report { width: 100%; }
+            .print-title { font-size: 14px; font-weight: 700; margin: 0 0 3px 0; }
+            .print-subtitle { font-size: 11px; font-weight: 700; margin: 0 0 6px 0; }
+            .print-meta { font-size: 8px; line-height: 1.2; margin-bottom: 5px; }
+            .print-list-title { font-size: 8px; font-weight: 700; margin: 0 0 4px; }
+            .print-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+            .print-page { break-after: page; page-break-after: always; page-break-inside: avoid; }
+            .print-page:last-child { break-after: auto; page-break-after: auto; }
+            .print-table { border-collapse: collapse; font-size: 7.5px; width: 100%; }
+            .print-table th, .print-table td { border: 1px solid #bbb; height: 10px; line-height: 1.05; padding: 1px 3px; text-align: left; }
+            .print-table th { background: #f2f2f2; font-weight: 700; }
+            .empty { border: 1px solid #bbb; font-size: 8px; padding: 6px; }
+            @media screen {
+              body { padding: 24px; }
+              .print-report { max-width: 760px; }
+            }
           </style>
         </head>
         <body>
-          <h1>CromoSwap Cuenca</h1>
-          <h2>${escapeHtml(title)}</h2>
-          <div class="meta">
-            <p><strong>Fecha:</strong> ${escapeHtml(printedAt)}</p>
-            <p><strong>Usuario:</strong> ${escapeHtml(userName || "Usuario")}</p>
+          <div class="print-report">
+            <h1 class="print-title">CromoSwap Cuenca</h1>
+            <h2 class="print-subtitle">${escapeHtml(title)}</h2>
+            <div class="print-meta">Fecha: ${escapeHtml(printedAt)} | Usuario: ${escapeHtml(userName || "Usuario")}</div>
+            <p class="print-list-title">Lista de cromos:</p>
+            ${rows.length > 0 ? tables : `<p class="empty">${escapeHtml(emptyMessage)}</p>`}
           </div>
-          <p><strong>Lista de cromos:</strong></p>
-          ${
-            rows.length > 0
-              ? `<table><thead><tr>${tableHeaders}</tr></thead><tbody>${rows.join("")}</tbody></table>`
-              : `<p class="empty">${escapeHtml(emptyMessage)}</p>`
-          }
           <script>
             window.onload = function () {
               window.focus();
@@ -236,37 +254,38 @@ export function InventoryManager({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_14px_34px_rgba(15,23,42,0.08)] sm:p-5">
-        <div className="grid gap-5 md:grid-cols-[220px_1fr] md:items-center">
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-slate-50/80 p-4 text-center">
-            <p className="mb-3 text-sm font-bold text-slate-500">Progreso del album</p>
-            <div
-              className="grid h-32 w-32 place-items-center rounded-full transition-all duration-700 ease-out"
-              style={{
-                background: `conic-gradient(#2f855f ${progress * 3.6}deg, #e5e7eb 0deg)`
-              }}
-            >
-              <div className="grid h-24 w-24 place-items-center rounded-full bg-white shadow-inner">
-                <span className="text-3xl font-black text-field">{progress}%</span>
-              </div>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1fr_2fr_1fr_1fr]">
+        <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-slate-200/80 bg-white p-4 text-center shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+          <p className="mb-2 text-sm font-bold text-slate-500">Progreso del album</p>
+          <div
+            className="grid h-24 w-24 place-items-center rounded-full transition-all duration-700 ease-out"
+            style={{
+              background: `conic-gradient(#2f855f ${progress * 3.6}deg, #e5e7eb 0deg)`
+            }}
+          >
+            <div className="grid h-[72px] w-[72px] place-items-center rounded-full bg-white shadow-inner">
+              <span className="text-2xl font-black text-field">{progress}%</span>
             </div>
-            <p className="mt-3 text-sm font-black text-ink">{owned}/{stickers.length}</p>
           </div>
+          <p className="mt-2 text-xs font-black text-ink">{owned}/{stickers.length} cromos registrados</p>
+        </div>
 
-          <div className="grid gap-3">
+        <div className="flex h-full flex-col justify-center rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+          <p className="mb-3 text-sm font-bold text-slate-500">Buscar cromos</p>
+          <div className="grid gap-2">
             <label className="relative block">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                 <SearchIcon />
               </span>
               <input
-                className="rounded-2xl border-slate-200 bg-slate-50 py-4 pl-12 pr-4 text-base shadow-sm transition hover:bg-white focus:border-blue-300 focus:bg-white focus:ring-blue-100"
+                className="rounded-xl border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-sm shadow-sm transition hover:bg-white focus:border-blue-300 focus:bg-white focus:ring-blue-100"
                 placeholder="Buscar por numero, seccion o nombre"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
             </label>
             <select
-              className="max-w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-4 text-base font-bold text-ink shadow-sm transition hover:bg-white focus:border-blue-300 focus:bg-white focus:ring-blue-100 md:max-w-[220px]"
+              className="rounded-xl border-slate-200 bg-slate-50 px-3 py-3 text-sm font-bold text-ink shadow-sm transition hover:bg-white focus:border-blue-300 focus:bg-white focus:ring-blue-100"
               value={filter}
               onChange={(event) => setFilter(event.target.value as Filter)}
             >
@@ -276,21 +295,25 @@ export function InventoryManager({
             </select>
           </div>
         </div>
-      </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
-          <p className="text-sm font-bold text-slate-500">Repetidos</p>
-          <p className="mt-1 text-3xl font-black text-ink">{repeatedEntries.length}</p>
-          <button className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100" onClick={() => printSummary("REPEATED")}>
+        <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+          <div>
+            <p className="text-sm font-bold text-slate-500">Repetidos</p>
+            <p className="mt-1 text-3xl font-black text-ink">{repeatedEntries.length}</p>
+            <p className="mt-1 text-xs font-semibold text-slate-500">cromos repetidos</p>
+          </div>
+          <button className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100" onClick={() => printSummary("REPEATED")}>
             <PrintIcon />
             Imprimir resumen
           </button>
         </div>
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
-          <p className="text-sm font-bold text-slate-500">Faltantes</p>
-          <p className="mt-1 text-3xl font-black text-ink">{missingStickers.length}</p>
-          <button className="mt-4 inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100" onClick={() => printSummary("MISSING")}>
+        <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+          <div>
+            <p className="text-sm font-bold text-slate-500">Faltantes</p>
+            <p className="mt-1 text-3xl font-black text-ink">{missingStickers.length}</p>
+            <p className="mt-1 text-xs font-semibold text-slate-500">cromos faltantes</p>
+          </div>
+          <button className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100" onClick={() => printSummary("MISSING")}>
             <PrintIcon />
             Imprimir resumen
           </button>
