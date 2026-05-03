@@ -6,8 +6,6 @@ import { signOut, useSession } from "next-auth/react";
 const userLinks = [
   ["Inicio", "/dashboard"],
   ["Album", "/album"],
-  ["Repetidos", "/repeated"],
-  ["Faltantes", "/missing"],
   ["Matches", "/matches"],
   ["Chat", "/chat"],
   ["Perfil", "/profile"]

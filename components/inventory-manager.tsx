@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 type Sticker = { id: string; number: number; code: string; name: string; section: string };
 type Entry = { id: string; status: "HAVE" | "REPEATED" | "MISSING"; quantity: number; sticker: Sticker };
+type Filter = "ALL" | "MISSING" | "REPEATED";
 
 const labels = { HAVE: "Tengo", REPEATED: "Repetido", MISSING: "Sin registrar" };
 
@@ -47,7 +48,8 @@ export function InventoryManager({
 }) {
   const [entries, setEntries] = useState<Entry[]>(initialEntries);
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<"ALL" | "HAVE" | "REPEATED">(defaultStatus === "MISSING" ? "ALL" : defaultStatus ?? "ALL");
+  const initialFilter: Filter = defaultStatus === "REPEATED" || defaultStatus === "MISSING" ? defaultStatus : "ALL";
+  const [filter, setFilter] = useState<Filter>(initialFilter);
 
   const entryBySticker = useMemo(() => new Map(entries.map((entry) => [entry.sticker.id, entry])), [entries]);
   const visibleStickers = stickers
@@ -62,8 +64,10 @@ export function InventoryManager({
       );
     })
     .filter((sticker) => {
+      const entry = entryBySticker.get(sticker.id);
       if (filter === "ALL") return true;
-      return entryBySticker.get(sticker.id)?.status === filter;
+      if (filter === "MISSING") return entry?.status !== "HAVE" && entry?.status !== "REPEATED";
+      return entry?.status === "REPEATED";
     })
     .slice(0, 120);
 
@@ -132,9 +136,9 @@ export function InventoryManager({
 
       <div className="card grid gap-3 md:grid-cols-[1fr_auto]">
         <input placeholder="Buscar por numero, seccion o nombre" value={query} onChange={(event) => setQuery(event.target.value)} />
-        <select value={filter} onChange={(event) => setFilter(event.target.value as typeof filter)}>
+        <select value={filter} onChange={(event) => setFilter(event.target.value as Filter)}>
           <option value="ALL">Todos</option>
-          <option value="HAVE">Tengo</option>
+          <option value="MISSING">Faltantes</option>
           <option value="REPEATED">Repetidos</option>
         </select>
       </div>
