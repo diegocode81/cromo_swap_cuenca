@@ -27,17 +27,6 @@ function StackIcon() {
   );
 }
 
-function TrashIcon() {
-  return (
-    <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 20 20" fill="none">
-      <path d="M3.5 5.5h13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M8 3.5h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="m5.5 5.5.7 10.2A1.8 1.8 0 0 0 8 17.4h4a1.8 1.8 0 0 0 1.8-1.7l.7-10.2" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-      <path d="M8.5 8.5v5.5M11.5 8.5v5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function SearchIcon() {
   return (
     <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 20 20" fill="none">
@@ -147,6 +136,15 @@ export function InventoryManager({
   async function remove(entryId: string) {
     const response = await fetch(`/api/user-stickers/${entryId}`, { method: "DELETE" });
     if (response.ok) setEntries((prev) => prev.filter((entry) => entry.id !== entryId));
+  }
+
+  async function toggleHave(stickerId: string) {
+    const current = entryBySticker.get(stickerId);
+    if (current?.status === "HAVE" || current?.status === "REPEATED") {
+      await remove(current.id);
+      return;
+    }
+    await mark(stickerId, "HAVE");
   }
 
   const owned = entries.filter((entry) => entry.status === "HAVE" || entry.status === "REPEATED").length;
@@ -337,15 +335,16 @@ export function InventoryManager({
                   {sticker.name !== sticker.section ? <p className="text-sm text-slate-600">{sticker.name}</p> : null}
                 </div>
                 <button
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-sm font-bold transition sm:px-4 ${
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-bold transition active:scale-95 sm:px-4 ${
                     hasSticker
-                      ? "bg-blue-100 text-blue-700 shadow-sm"
-                      : "bg-slate-100 text-slate-500 hover:bg-blue-50 hover:text-blue-700"
+                      ? "border-blue-200 bg-blue-100 text-blue-600 shadow-sm"
+                      : "border-gray-200 bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-700"
                   }`}
-                  onClick={() => mark(sticker.id, "HAVE")}
+                  onClick={() => toggleHave(sticker.id)}
+                  aria-pressed={hasSticker}
                 >
                   <span className={`grid h-5 w-5 place-items-center rounded-full border ${hasSticker ? "border-blue-500" : "border-slate-300"}`}>
-                    <CheckIcon />
+                    {hasSticker ? <CheckIcon /> : null}
                   </span>
                   Tengo
                 </button>
@@ -385,16 +384,6 @@ export function InventoryManager({
                   </button>
                 </div>
               </div>
-
-              {entry ? (
-                <>
-                  <div className="my-4 h-px bg-slate-200" />
-                  <button className="inline-flex items-center gap-2 text-sm font-bold text-red-600 transition hover:text-red-700" onClick={() => remove(entry.id)}>
-                    <TrashIcon />
-                  Quitar registro
-                  </button>
-                </>
-              ) : null}
             </article>
           );
         })}
