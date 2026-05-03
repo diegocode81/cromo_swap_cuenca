@@ -350,27 +350,27 @@ export function InventoryManager({
 
               <div className="my-5 h-px bg-slate-200" />
 
-              <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/90 p-3">
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-blue-600 shadow-sm">
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                <div className="flex min-w-0 items-center gap-1 text-xs font-semibold text-slate-600">
+                  <span className="grid h-6 w-6 shrink-0 place-items-center text-blue-600">
                     <StackIcon />
                   </span>
-                  <span className="truncate text-sm font-bold text-slate-700 sm:text-base">{labels.REPEATED}</span>
+                  <span className="whitespace-nowrap">Rep.</span>
                 </div>
-                <div className="grid grid-cols-[38px_48px_38px] items-center gap-2 sm:grid-cols-[42px_54px_42px]">
+                <div className="flex shrink-0 items-center gap-1">
                   <button
-                    className="grid h-10 w-10 place-items-center rounded-lg border border-blue-200 bg-white text-xl font-black leading-none text-blue-600 shadow-sm transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-300 disabled:shadow-none"
+                    className="grid h-8 w-8 place-items-center rounded-lg border border-blue-200 bg-white text-sm font-bold leading-none text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-300"
                     disabled={entry?.status !== "REPEATED"}
                     onClick={() => adjustRepeated(sticker.id, -1)}
                     aria-label={`Restar repetido de ${sticker.code} ${sticker.number}`}
                   >
                     -
                   </button>
-                  <span className="grid h-10 place-items-center rounded-lg border border-slate-200 bg-white px-2 text-center text-lg font-black text-slate-950 shadow-sm">
+                  <span className="flex h-8 min-w-[32px] items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-sm font-bold text-slate-950">
                     {repeatedQuantity}
                   </span>
                   <button
-                    className="grid h-10 w-10 place-items-center rounded-lg border border-blue-200 bg-white text-2xl font-semibold leading-none text-blue-600 shadow-sm transition hover:bg-blue-50"
+                    className="grid h-8 w-8 place-items-center rounded-lg border border-blue-200 bg-white text-sm font-bold leading-none text-blue-600 transition hover:bg-blue-50"
                     onClick={() => adjustRepeated(sticker.id, 1)}
                     aria-label={`Sumar repetido de ${sticker.code} ${sticker.number}`}
                   >
