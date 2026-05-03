@@ -38,7 +38,8 @@ export function RestartSeasonForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const sections = parseSections(form.get("sections"));
     const status = String(form.get("status"));
     const response = await fetch("/api/admin/albums", {
@@ -70,7 +71,7 @@ export function RestartSeasonForm() {
     }
 
     setMessage(status === "ACTIVE" ? "Album creado y activado." : "Album creado como borrador.");
-    event.currentTarget.reset();
+    formElement.reset();
   }
 
   return (
@@ -229,7 +230,8 @@ export function AdminPasswordForm({ userId }: { userId: string }) {
     event.preventDefault();
     if (isSaving) return;
 
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const password = String(form.get("password") ?? "").trim();
     if (password.length < 8) {
       setMessage("La contrasena debe tener minimo 8 caracteres.");
@@ -249,7 +251,7 @@ export function AdminPasswordForm({ userId }: { userId: string }) {
       });
 
       if (response.ok) {
-        event.currentTarget.reset();
+        formElement.reset();
         setMessage("Contrasena actualizada correctamente.");
         return;
       }

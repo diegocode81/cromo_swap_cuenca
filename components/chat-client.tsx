@@ -42,7 +42,8 @@ export function ChatClient({
 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const content = String(form.get("content") ?? "").trim();
     if (!content) return;
     const response = await fetch("/api/messages", {
@@ -51,14 +52,15 @@ export function ChatClient({
       body: JSON.stringify({ conversationId, content })
     });
     if (response.ok) {
-      event.currentTarget.reset();
+      formElement.reset();
       await load();
     }
   }
 
   async function report(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const reason = String(form.get("reason") ?? "").trim();
     if (!reason) return;
     const response = await fetch("/api/reports", {
@@ -67,7 +69,7 @@ export function ChatClient({
       body: JSON.stringify({ conversationId, reportedUserId, reason })
     });
     setReportMessage(response.ok ? "Reporte enviado para revision." : "No se pudo enviar el reporte.");
-    event.currentTarget.reset();
+    if (response.ok) formElement.reset();
   }
 
   return (
