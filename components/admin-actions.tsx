@@ -236,9 +236,6 @@ export function AdminPasswordForm({ userId }: { userId: string }) {
       return;
     }
 
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 15000);
-
     setIsSaving(true);
     setMessage("Actualizando...");
 
@@ -246,8 +243,7 @@ export function AdminPasswordForm({ userId }: { userId: string }) {
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-        signal: controller.signal
+        body: JSON.stringify({ password })
       });
 
       if (response.ok) {
@@ -259,13 +255,11 @@ export function AdminPasswordForm({ userId }: { userId: string }) {
       const data = await response.json().catch(() => ({}));
       setMessage(data.error ?? "No se pudo actualizar la contrasena.");
     } catch (error) {
+      console.error("[AdminPasswordForm] password update failed", error);
       setMessage(
-        error instanceof DOMException && error.name === "AbortError"
-          ? "La solicitud tardo demasiado. Intenta nuevamente."
-          : "No se pudo conectar con el servidor."
+        "No se pudo conectar con el servidor. Revisa tu conexion e intenta nuevamente."
       );
     } finally {
-      window.clearTimeout(timeoutId);
       setIsSaving(false);
     }
   }

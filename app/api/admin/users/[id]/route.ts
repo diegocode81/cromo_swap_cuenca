@@ -15,6 +15,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     await requireAdmin();
     const data = schema.parse(await request.json());
     const { password, ...rest } = data;
+    if (Object.keys(rest).length === 0 && !password) {
+      return json({ error: "No hay cambios para actualizar" }, { status: 400 });
+    }
     const user = await prisma.user.update({
       where: { id: params.id },
       data: {
@@ -25,6 +28,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     });
     return json({ user });
   } catch (error) {
+    console.error("[AdminUsers] update failed", error);
     return badRequest(error);
   }
 }
