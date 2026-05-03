@@ -19,8 +19,12 @@ export function LoginForm() {
       password: form.get("password"),
       redirect: false
     });
-    if (result?.ok) router.push("/dashboard");
-    else setError("Email o contrasena incorrectos.");
+    if (result?.ok) {
+      router.push("/dashboard");
+      router.refresh();
+    } else {
+      setError("Email o contrasena incorrectos.");
+    }
   }
 
   return (

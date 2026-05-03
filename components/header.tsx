@@ -1,6 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { signOut, useSession } from "next-auth/react";
 
 const userLinks = [
   ["Inicio", "/dashboard"],
@@ -12,27 +13,28 @@ const userLinks = [
   ["Perfil", "/profile"]
 ];
 
-export async function Header() {
-  const session = await getServerSession(authOptions);
+export function Header() {
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated" && Boolean(session);
 
   return (
     <header className="border-b border-emerald-100 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:px-6">
         <div className="flex items-center justify-between gap-3">
-          <Link href={session ? "/dashboard" : "/"} className="text-lg font-black text-field">
+          <Link href={isAuthenticated ? "/dashboard" : "/"} className="text-lg font-black text-field">
             CromoSwap Cuenca
           </Link>
           <div className="flex gap-2">
-            {session ? (
+            {isAuthenticated ? (
               <>
                 {session.user.role === "ADMIN" ? (
                   <Link className="btn-secondary py-2" href="/admin">
                     Admin
                   </Link>
                 ) : null}
-                <Link className="btn-secondary py-2" href="/api/auth/signout">
+                <button className="btn-secondary py-2" type="button" onClick={() => signOut({ callbackUrl: "/" })}>
                   Salir
-                </Link>
+                </button>
               </>
             ) : (
               <>
@@ -46,7 +48,7 @@ export async function Header() {
             )}
           </div>
         </div>
-        {session ? (
+        {isAuthenticated ? (
           <nav className="flex gap-2 overflow-x-auto pb-1 text-sm">
             {userLinks.map(([label, href]) => (
               <Link key={href} href={href} className="whitespace-nowrap rounded-full bg-sky px-3 py-2 font-medium">
