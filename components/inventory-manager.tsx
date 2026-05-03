@@ -152,6 +152,7 @@ export function InventoryManager({
   const repeatedEntries = entries
     .filter((entry) => entry.status === "REPEATED" && entry.quantity > 0)
     .sort((a, b) => a.sticker.code.localeCompare(b.sticker.code) || a.sticker.number - b.sticker.number);
+  const repeatedTotal = repeatedEntries.reduce((total, entry) => total + (Number(entry.quantity) || 0), 0);
   const missingStickers = stickers.filter((sticker) => {
     const entry = entryBySticker.get(sticker.id);
     return entry?.status !== "HAVE" && entry?.status !== "REPEATED";
@@ -299,7 +300,7 @@ export function InventoryManager({
         <div className="flex h-full flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
           <div>
             <p className="text-sm font-bold text-slate-500">Repetidos</p>
-            <p className="mt-1 text-3xl font-black text-ink">{repeatedEntries.length}</p>
+            <p className="mt-1 text-3xl font-black text-ink">{repeatedTotal}</p>
             <p className="mt-1 text-xs font-semibold text-slate-500">cromos repetidos</p>
           </div>
           <button className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100" onClick={() => printSummary("REPEATED")}>

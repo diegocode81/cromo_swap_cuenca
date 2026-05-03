@@ -8,7 +8,11 @@ export default async function ProfilePage() {
   const album = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
   const [registered, repeated, missing, matches, unreadMessages] = await Promise.all([
     album ? prisma.userSticker.count({ where: { userId: user.id, albumId: album.id } }) : 0,
-    album ? prisma.userSticker.count({ where: { userId: user.id, albumId: album.id, status: "REPEATED" } }) : 0,
+    album
+      ? prisma.userSticker
+          .aggregate({ where: { userId: user.id, albumId: album.id, status: "REPEATED" }, _sum: { quantity: true } })
+          .then((result) => result._sum.quantity ?? 0)
+      : 0,
     album ? prisma.userSticker.count({ where: { userId: user.id, albumId: album.id, status: "MISSING" } }) : 0,
     album ? prisma.exchangeMatch.count({ where: { albumId: album.id, OR: [{ userAId: user.id }, { userBId: user.id }] } }) : 0,
     prisma.message.count({ where: { isRead: false, senderId: { not: user.id }, conversation: { OR: [{ userAId: user.id }, { userBId: user.id }] } } })

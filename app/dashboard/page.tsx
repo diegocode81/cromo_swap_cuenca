@@ -8,7 +8,11 @@ export default async function DashboardPage() {
   const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
   const [registered, repeated, missing, matches, unreadMessages] = await Promise.all([
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id } }) : 0,
-    activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id, status: "REPEATED" } }) : 0,
+    activeAlbum
+      ? prisma.userSticker
+          .aggregate({ where: { userId: user.id, albumId: activeAlbum.id, status: "REPEATED" }, _sum: { quantity: true } })
+          .then((result) => result._sum.quantity ?? 0)
+      : 0,
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id, status: "MISSING" } }) : 0,
     activeAlbum
       ? prisma.exchangeMatch.count({ where: { albumId: activeAlbum.id, OR: [{ userAId: user.id }, { userBId: user.id }] } })

@@ -12,7 +12,9 @@ export async function GET() {
         ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id } })
         : 0,
       activeAlbum
-        ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id, status: "REPEATED" } })
+        ? prisma.userSticker
+            .aggregate({ where: { userId: user.id, albumId: activeAlbum.id, status: "REPEATED" }, _sum: { quantity: true } })
+            .then((result) => result._sum.quantity ?? 0)
         : 0,
       activeAlbum
         ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id, status: "MISSING" } })
