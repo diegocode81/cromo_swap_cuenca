@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { PasswordInput } from "@/components/password-input";
 import { CUENCA_ZONES } from "@/lib/zones";
 
 export function LoginForm() {
@@ -30,7 +31,7 @@ export function LoginForm() {
       </div>
       <div>
         <label className="label">Contrasena</label>
-        <input name="password" type="password" required />
+        <PasswordInput name="password" required />
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <button className="btn-primary w-full" type="submit">
@@ -83,7 +84,7 @@ export function RegisterForm() {
       </div>
       <div>
         <label className="label">Contrasena</label>
-        <input name="password" type="password" required minLength={8} />
+        <PasswordInput name="password" required minLength={8} />
       </div>
       <div>
         <label className="label">Ciudad</label>

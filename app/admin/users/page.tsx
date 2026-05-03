@@ -54,7 +54,7 @@ export default async function AdminUsersPage({
         <input name="q" defaultValue={q} placeholder="Buscar por nombre, email o zona" />
         <button className="btn-primary" type="submit">Buscar</button>
       </form>
-      <div className="grid gap-3">
+      <div className="grid gap-3 lg:grid-cols-2">
         {users.map((user) => (
           <article key={user.id} className="card space-y-4">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">

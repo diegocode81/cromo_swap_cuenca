@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { PasswordInput } from "@/components/password-input";
 
 type AlbumStatus = "DRAFT" | "ACTIVE" | "ARCHIVED";
 
@@ -245,7 +246,7 @@ export function AdminPasswordForm({ userId }: { userId: string }) {
 
   return (
     <form onSubmit={onSubmit} className="grid gap-2 sm:grid-cols-[1fr_auto]">
-      <input name="password" type="password" minLength={8} maxLength={80} placeholder="Nueva contrasena" required />
+      <PasswordInput name="password" minLength={8} maxLength={80} placeholder="Nueva contrasena" required />
       <button className="btn-secondary py-2" type="submit">Cambiar</button>
       {message ? <p className="text-sm text-slate-600 sm:col-span-2">{message}</p> : null}
     </form>
