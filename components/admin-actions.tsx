@@ -17,6 +17,17 @@ function parseSections(raw: FormDataEntryValue | null) {
     .filter((section) => section.code && section.name && Number.isFinite(section.count) && section.count > 0);
 }
 
+function hasRepeatedSectionCodes(sections: { code: string; name: string; count: number }[]) {
+  const seen = new Set<string>();
+  const repeated = new Set<string>();
+  sections.forEach((section) => {
+    const code = section.code.toUpperCase();
+    if (seen.has(code)) repeated.add(code);
+    seen.add(code);
+  });
+  return Array.from(repeated);
+}
+
 export function RunAgentButton() {
   const [message, setMessage] = useState("");
   async function run() {
@@ -41,6 +52,11 @@ export function RestartSeasonForm() {
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     const sections = parseSections(form.get("sections"));
+    const repeatedCodes = hasRepeatedSectionCodes(sections);
+    if (repeatedCodes.length > 0) {
+      setMessage(`Cada seccion debe tener un codigo unico. Repetidos: ${repeatedCodes.join(", ")}.`);
+      return;
+    }
     const status = String(form.get("status"));
     const response = await fetch("/api/admin/albums", {
       method: "POST",
@@ -121,6 +137,11 @@ export function EditAlbumForm({
     const form = new FormData(event.currentTarget);
     const nextStatus = String(form.get("status")) as AlbumStatus;
     const sections = parseSections(form.get("sections"));
+    const repeatedCodes = hasRepeatedSectionCodes(sections);
+    if (sections.length > 0 && repeatedCodes.length > 0) {
+      setMessage(`Cada seccion debe tener un codigo unico. Repetidos: ${repeatedCodes.join(", ")}.`);
+      return;
+    }
 
     if (nextStatus === "ACTIVE" && status !== "ACTIVE") {
       const confirmed = window.confirm("Al activar este album, se desactivara el album activo actual.");
@@ -193,6 +214,9 @@ export function EditAlbumForm({
           placeholder={"HAI,Haiti,20\nECU,Ecuador,20"}
         />
       </div>
+      <p className="text-sm text-slate-600">
+        Cada linea necesita un codigo unico porque ese codigo reinicia la numeracion. No repitas GEN para varias secciones.
+      </p>
       <div>
         <label className="label">Cantidad total si no usas secciones</label>
         <input

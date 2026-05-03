@@ -7,7 +7,27 @@ type AlbumInput = {
   sections?: { code: string; name: string; count: number }[];
 };
 
+export function validateUniqueSectionCodes(sections?: { code: string; name: string; count: number }[]) {
+  if (!sections?.length) return;
+
+  const seen = new Set<string>();
+  const repeated = new Set<string>();
+
+  sections.forEach((section) => {
+    const code = section.code.toUpperCase();
+    if (seen.has(code)) repeated.add(code);
+    seen.add(code);
+  });
+
+  if (repeated.size > 0) {
+    throw new Error(
+      `Cada seccion debe tener un codigo unico. Codigos repetidos: ${Array.from(repeated).join(", ")}. Ejemplo: INT,Intro,40 y EQ1,Equipo 1,20.`
+    );
+  }
+}
+
 export function buildStickerCatalog(data: AlbumInput, albumId: string) {
+  validateUniqueSectionCodes(data.sections);
   const sections =
     data.sections && data.sections.length > 0
       ? data.sections

@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth";
-import { buildStickerCatalog, totalFromSections } from "@/lib/album-admin";
+import { buildStickerCatalog, totalFromSections, validateUniqueSectionCodes } from "@/lib/album-admin";
 import { badRequest, forbidden, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { albumSchema } from "@/lib/validators";
@@ -21,6 +21,7 @@ export async function POST(request: Request) {
   try {
     await requireAdmin();
     const data = albumSchema.parse(await request.json());
+    validateUniqueSectionCodes(data.sections);
     const totalStickers = totalFromSections(data);
     const album = await prisma.$transaction(async (tx) => {
       const created = await tx.album.create({

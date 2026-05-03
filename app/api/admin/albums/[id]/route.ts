@@ -4,7 +4,8 @@ import {
   buildStickerCatalog,
   clearAlbumCommunityData,
   deleteAlbumGraph,
-  totalFromSections
+  totalFromSections,
+  validateUniqueSectionCodes
 } from "@/lib/album-admin";
 import { badRequest, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
@@ -35,6 +36,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   try {
     await requireAdmin();
     const data = schema.parse(await request.json());
+    validateUniqueSectionCodes(data.sections);
     const shouldActivate = data.status === "ACTIVE" || data.isActive === true;
     const shouldReplaceCatalog = Boolean(data.sections?.length || data.totalStickers);
     const album = await prisma.$transaction(async (tx) => {
