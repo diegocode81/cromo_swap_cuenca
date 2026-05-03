@@ -14,6 +14,21 @@ export const loginSchema = z.object({
   password: z.string().min(1)
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email().max(160).toLowerCase()
+});
+
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(20),
+    password: z.string().min(8).max(80),
+    confirmPassword: z.string().min(8).max(80)
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Las contrasenas no coinciden",
+    path: ["confirmPassword"]
+  });
+
 export const profileSchema = z.object({
   name: z.string().min(2).max(80),
   zone: z.enum(CUENCA_ZONES)

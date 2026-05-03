@@ -28,9 +28,12 @@ DIRECT_URL="postgresql://USER:PASSWORD@HOST.REGION.aws.neon.tech/DB?sslmode=requ
 NEXTAUTH_SECRET="un-secreto-largo"
 NEXTAUTH_URL="http://localhost:3000"
 CRON_SECRET="otro-secreto-largo"
+RESEND_API_KEY="re_..."
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 En Neon usa `DATABASE_URL` con pooling para la app y `DIRECT_URL` sin pooling para migraciones.
+`RESEND_API_KEY` se usa para enviar enlaces de recuperacion de contrasena. En produccion configura `NEXT_PUBLIC_APP_URL` como `https://cromoswapcuenca.vercel.app`.
 
 ## Base de datos
 
@@ -84,7 +87,7 @@ npm run build
 ## Deploy en Vercel
 
 1. Crea una base PostgreSQL en Neon.
-2. Configura las variables de entorno en Vercel: `DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `CRON_SECRET`.
+2. Configura las variables de entorno en Vercel: `DATABASE_URL`, `DIRECT_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `CRON_SECRET`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`.
 3. Ejecuta migraciones contra Neon desde local o CI: `npm run prisma:migrate`.
 4. Ejecuta seed una vez: `npm run prisma:seed`.
 5. Despliega en Vercel.

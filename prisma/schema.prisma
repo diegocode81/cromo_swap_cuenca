@@ -40,26 +40,40 @@ enum AlbumStatus {
 }
 
 model User {
-  id           String          @id @default(cuid())
-  name         String
-  email        String          @unique
-  passwordHash String
-  city         String          @default("Cuenca")
-  zone         String
-  role         Role            @default(USER)
-  isActive     Boolean         @default(true)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  stickers     UserSticker[]
-  matchesAsA   ExchangeMatch[] @relation("MatchUserA")
-  matchesAsB   ExchangeMatch[] @relation("MatchUserB")
-  chatsAsA      Conversation[]  @relation("ConversationUserA")
-  chatsAsB      Conversation[]  @relation("ConversationUserB")
-  messages     Message[]
-  reportsMade  Report[]        @relation("ReportsMade")
-  reportsGot   Report[]        @relation("ReportsGot")
+  id                  String               @id @default(cuid())
+  name                String
+  email               String               @unique
+  passwordHash        String
+  city                String               @default("Cuenca")
+  zone                String
+  role                Role                 @default(USER)
+  isActive            Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  stickers            UserSticker[]
+  matchesAsA          ExchangeMatch[]      @relation("MatchUserA")
+  matchesAsB          ExchangeMatch[]      @relation("MatchUserB")
+  chatsAsA            Conversation[]       @relation("ConversationUserA")
+  chatsAsB            Conversation[]       @relation("ConversationUserB")
+  messages            Message[]
+  reportsMade         Report[]             @relation("ReportsMade")
+  reportsGot          Report[]             @relation("ReportsGot")
+  passwordResetTokens PasswordResetToken[]
 
   @@index([city, zone])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt, usedAt])
 }
 
 model Album {
@@ -117,21 +131,21 @@ model UserSticker {
 }
 
 model ExchangeMatch {
-  id                String        @id @default(cuid())
-  albumId           String
-  userAId           String
-  userBId           String
-  stickersFromAToB  Json
-  stickersFromBToA  Json
-  score             Int
-  status            MatchStatus   @default(SUGGESTED)
-  lastCheckedAt     DateTime      @default(now())
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  album             Album         @relation(fields: [albumId], references: [id], onDelete: Cascade)
-  userA             User          @relation("MatchUserA", fields: [userAId], references: [id], onDelete: Cascade)
-  userB             User          @relation("MatchUserB", fields: [userBId], references: [id], onDelete: Cascade)
-  conversations     Conversation[]
+  id               String         @id @default(cuid())
+  albumId          String
+  userAId          String
+  userBId          String
+  stickersFromAToB Json
+  stickersFromBToA Json
+  score            Int
+  status           MatchStatus    @default(SUGGESTED)
+  lastCheckedAt    DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  album            Album          @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  userA            User           @relation("MatchUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB            User           @relation("MatchUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  conversations    Conversation[]
 
   @@unique([albumId, userAId, userBId])
   @@index([albumId, score])
