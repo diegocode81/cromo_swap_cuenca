@@ -3,11 +3,10 @@ import { forbidden, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
 function hasValidSecret(request: Request) {
-  const { searchParams } = new URL(request.url);
   const configured = process.env.CRON_SECRET;
   if (!configured) return false;
   const auth = request.headers.get("authorization");
-  return searchParams.get("secret") === configured || auth === `Bearer ${configured}`;
+  return auth === `Bearer ${configured}`;
 }
 
 export async function GET(request: Request) {

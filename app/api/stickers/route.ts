@@ -3,6 +3,8 @@ import { badRequest, forbidden, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { requireActiveAlbum } from "@/lib/domain";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   try {
     await requireUser();

@@ -7,7 +7,10 @@ export default async function ConversationPage({ params }: { params: { conversat
   const user = await requireUser();
   const conversation = await prisma.conversation.findFirst({
     where: { id: params.conversationId, OR: [{ userAId: user.id }, { userBId: user.id }] },
-    include: { userA: true, userB: true }
+    include: {
+      userA: { select: { id: true, name: true, city: true } },
+      userB: { select: { id: true, name: true, city: true } }
+    }
   });
   if (!conversation) notFound();
   const other = conversation.userAId === user.id ? conversation.userB : conversation.userA;

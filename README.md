@@ -8,7 +8,7 @@ Plataforma comunitaria gratuita para intercambiar cromos en Cuenca, Ecuador. La 
 - API Route Handlers de Next.js
 - PostgreSQL en Neon con Prisma
 - NextAuth credentials con JWT
-- bcryptjs para hash de contrasenas
+- bcrypt para hash de contrasenas
 - Zod para validaciones
 - Vercel Cron Jobs para el agente de intercambios
 - Chat interno persistido con polling simple
@@ -30,6 +30,8 @@ NEXTAUTH_URL="http://localhost:3000"
 CRON_SECRET="otro-secreto-largo"
 RESEND_API_KEY="re_..."
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
+SEED_ADMIN_EMAIL="admin@cromoswap.ec"
+SEED_ADMIN_PASSWORD="usa-una-contrasena-segura-solo-para-seed"
 ```
 
 En Neon usa `DATABASE_URL` con pooling para la app y `DIRECT_URL` sin pooling para migraciones.
@@ -44,11 +46,11 @@ npm run prisma:seed
 
 El seed crea:
 
-- Album activo `Mundial 2026`
+- Album `Mundial 2026`; lo deja activo solo si no existe otro album activo
 - Catalogo inicial parametrizado por secciones/equipos
-- Usuario admin `admin@cromoswap.ec` con contrasena `Admin12345!`
+- Usuario admin usando `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD`
 
-Cambia esa contrasena despues del primer acceso.
+`SEED_ADMIN_PASSWORD` es obligatorio solo cuando el admin inicial no existe. No uses una contrasena publica ni reutilizada.
 
 ## Gestion de albumes
 
@@ -92,7 +94,7 @@ npm run build
 4. Ejecuta seed una vez: `npm run prisma:seed`.
 5. Despliega en Vercel.
 
-`vercel.json` ejecuta `/api/cron/exchange-agent` una vez al dia para ser compatible con Vercel Hobby. En Vercel Pro puedes cambiar el schedule a `0 * * * *` para ejecutarlo cada hora. El endpoint valida `CRON_SECRET` por header `Authorization: Bearer <secret>` o query `?secret=<secret>`.
+`vercel.json` ejecuta `/api/cron/exchange-agent` una vez al dia para ser compatible con Vercel Hobby. En Vercel Pro puedes cambiar el schedule a `0 * * * *` para ejecutarlo cada hora. El endpoint valida `CRON_SECRET` por header `Authorization: Bearer <secret>`.
 
 ## Arquitectura
 

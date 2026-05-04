@@ -9,7 +9,8 @@ export function badRequest(error: unknown) {
   if (error instanceof ZodError) {
     return json({ error: "Datos invalidos", issues: error.flatten() }, { status: 400 });
   }
-  return json({ error: error instanceof Error ? error.message : "Solicitud invalida" }, { status: 400 });
+  console.error("[api] request failed", error);
+  return json({ error: "Solicitud invalida" }, { status: 400 });
 }
 
 export function forbidden() {

@@ -4,6 +4,12 @@ import { badRequest, forbidden, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { conversationSchema } from "@/lib/validators";
 
+const conversationInclude = {
+  album: true,
+  userA: { select: { id: true, name: true, city: true } },
+  userB: { select: { id: true, name: true, city: true } }
+};
+
 export async function GET() {
   try {
     const user = await requireUser();
@@ -56,7 +62,7 @@ export async function POST(request: Request) {
 
     const conversation = await prisma.conversation.create({
       data: { userAId, userBId, exchangeMatchId: data.exchangeMatchId, albumId },
-      include: { userA: true, userB: true }
+      include: conversationInclude
     });
     return json({ conversation }, { status: 201 });
   } catch (error) {
