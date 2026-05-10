@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CromoSwap Cuenca</string>
+    <string name="title_activity_main">CromoSwap Cuenca</string>
+    <string name="package_name">com.codeconsultings.cromoswapcuenca</string>
+    <string name="custom_url_scheme">com.codeconsultings.cromoswapcuenca</string>
+</resources>
