@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
-import { AdminPasswordForm, ToggleUserButton } from "@/components/admin-actions";
+import { AdminPasswordForm, DeleteUserButton, ToggleUserButton } from "@/components/admin-actions";
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -55,7 +55,7 @@ export default async function AdminUsersPage({
       </form>
       <div className="grid gap-3 lg:grid-cols-2">
         {users.map((user) => (
-          <article key={user.id} className="card space-y-4">
+          <article key={user.id} className={`card space-y-4 ${user.role === "ADMIN" ? "admin-user-card" : ""}`}>
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
               <div>
                 <h2 className="text-lg font-black">{user.name}</h2>
@@ -65,7 +65,12 @@ export default async function AdminUsersPage({
                   {user._count.stickers} cromos · {user._count.messages} mensajes · {user._count.reportsGot} reportes
                 </p>
               </div>
-              <ToggleUserButton userId={user.id} isActive={user.isActive} />
+              {user.role !== "ADMIN" ? (
+                <div className="flex flex-wrap gap-2 sm:justify-end">
+                  <ToggleUserButton userId={user.id} isActive={user.isActive} />
+                  {user._count.stickers === 0 ? <DeleteUserButton userId={user.id} userName={user.name} /> : null}
+                </div>
+              ) : null}
             </div>
             <AdminPasswordForm userId={user.id} />
           </article>

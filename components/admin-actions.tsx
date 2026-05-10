@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { PasswordInput } from "@/components/password-input";
 
 type AlbumStatus = "DRAFT" | "ACTIVE" | "ARCHIVED";
@@ -255,6 +256,39 @@ export function ToggleUserButton({ userId, isActive }: { userId: string; isActiv
     if (response.ok) setActive(!active);
   }
   return <button className="btn-secondary py-2" onClick={toggle}>{active ? "Desactivar" : "Activar"}</button>;
+}
+
+export function DeleteUserButton({ userId, userName }: { userId: string; userName: string }) {
+  const router = useRouter();
+  const [message, setMessage] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  async function remove() {
+    const confirmed = window.confirm(`Eliminar ${userName}? Esta accion no se puede deshacer.`);
+    if (!confirmed || isDeleting) return;
+
+    setIsDeleting(true);
+    setMessage("");
+    const response = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+    const data = await response.json().catch(() => ({}));
+
+    if (response.ok) {
+      router.refresh();
+      return;
+    }
+
+    setMessage(data.error ?? "No se pudo eliminar el usuario.");
+    setIsDeleting(false);
+  }
+
+  return (
+    <div>
+      <button className="btn-secondary py-2 text-red-700 disabled:cursor-not-allowed disabled:opacity-60" onClick={remove} disabled={isDeleting}>
+        {isDeleting ? "Eliminando" : "Eliminar"}
+      </button>
+      {message ? <p className="mt-2 text-sm text-red-600">{message}</p> : null}
+    </div>
+  );
 }
 
 export function AdminPasswordForm({ userId }: { userId: string }) {

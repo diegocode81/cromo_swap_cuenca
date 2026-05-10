@@ -173,34 +173,43 @@ export function InventoryManager({
     const title = isRepeated ? "Resumen de cromos repetidos" : "Resumen de cromos faltantes";
     const rows: string[] = isRepeated
       ? repeatedEntries.map(
-          (entry, index) => `
+          (entry) => `
             <tr>
-              <td>${index + 1}</td>
               <td>${escapeHtml(`${entry.sticker.code} ${entry.sticker.number}`)}</td>
               <td>${escapeHtml(entry.sticker.section)}</td>
               <td>${entry.quantity}</td>
             </tr>`
         )
       : missingStickers.map(
-          (sticker, index) => `
+          (sticker) => `
             <tr>
-              <td>${index + 1}</td>
               <td>${escapeHtml(`${sticker.code} ${sticker.number}`)}</td>
               <td>${escapeHtml(sticker.section)}</td>
             </tr>`
         );
     const emptyMessage = isRepeated ? "No tienes cromos repetidos registrados." : "No tienes cromos faltantes registrados.";
-    const tableHeaders = isRepeated ? "<th>#</th><th>Codigo</th><th>Pais / seccion</th><th>Rep.</th>" : "<th>#</th><th>Codigo</th><th>Pais / seccion</th>";
-    const pages = Array.from({ length: Math.ceil(rows.length / 80) }, (_, index) => rows.slice(index * 80, index * 80 + 80));
+    const tableHeaders = isRepeated ? "<th>Codigo</th><th>Pais / seccion</th><th>Rep.</th>" : "<th>Codigo</th><th>Pais / seccion</th>";
+    const columnsPerPage = 7;
+    const rowsPerColumn = 112;
+    const rowsPerPage = columnsPerPage * rowsPerColumn;
+    const pages = Array.from({ length: Math.ceil(rows.length / rowsPerPage) }, (_, index) =>
+      rows.slice(index * rowsPerPage, index * rowsPerPage + rowsPerPage)
+    );
     const tables = pages
       .map((pageRows) => {
-        const leftRows = pageRows.slice(0, 40);
-        const rightRows = pageRows.slice(40, 80);
+        const pageColumns = Array.from({ length: columnsPerPage }, (_, columnIndex) =>
+          pageRows.slice(columnIndex * rowsPerColumn, columnIndex * rowsPerColumn + rowsPerColumn)
+        );
         return `
           <div class="print-page">
             <div class="print-columns">
-              <table class="print-table"><thead><tr>${tableHeaders}</tr></thead><tbody>${leftRows.join("")}</tbody></table>
-              ${rightRows.length > 0 ? `<table class="print-table"><thead><tr>${tableHeaders}</tr></thead><tbody>${rightRows.join("")}</tbody></table>` : "<div></div>"}
+              ${pageColumns
+                .map((columnRows) =>
+                  columnRows.length > 0
+                    ? `<table class="print-table"><thead><tr>${tableHeaders}</tr></thead><tbody>${columnRows.join("")}</tbody></table>`
+                    : "<div></div>"
+                )
+                .join("")}
             </div>
           </div>`;
       })
@@ -214,24 +223,27 @@ export function InventoryManager({
         <head>
           <title>${escapeHtml(title)}</title>
           <style>
-            @page { size: A4 portrait; margin: 8mm; }
+            @page { size: A4 portrait; margin: 5mm; }
             * { box-sizing: border-box; }
-            body { background: #fff; color: #000; font-family: Arial, sans-serif; font-size: 8px; margin: 0; padding: 8mm; }
+            body { background: #fff; color: #000; font-family: Arial, sans-serif; font-size: 6px; margin: 0; padding: 0; }
             .print-report { width: 100%; }
-            .print-title { font-size: 14px; font-weight: 700; margin: 0 0 3px 0; }
-            .print-subtitle { font-size: 11px; font-weight: 700; margin: 0 0 6px 0; }
-            .print-meta { font-size: 8px; line-height: 1.2; margin-bottom: 5px; }
-            .print-list-title { font-size: 8px; font-weight: 700; margin: 0 0 4px; }
-            .print-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+            .print-title { font-size: 11px; font-weight: 700; margin: 0 0 1.5mm 0; }
+            .print-subtitle { font-size: 8px; font-weight: 700; margin: 0 0 1.5mm 0; }
+            .print-meta { font-size: 6px; line-height: 1; margin-bottom: 1.5mm; }
+            .print-list-title { font-size: 6px; font-weight: 700; margin: 0 0 1.5mm; }
+            .print-columns { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.6mm; align-items: start; }
             .print-page { break-after: page; page-break-after: always; page-break-inside: avoid; }
             .print-page:last-child { break-after: auto; page-break-after: auto; }
-            .print-table { border-collapse: collapse; font-size: 7.5px; width: 100%; }
-            .print-table th, .print-table td { border: 1px solid #bbb; height: 10px; line-height: 1.05; padding: 1px 3px; text-align: left; }
+            .print-table { border-collapse: collapse; font-size: 4.2px; table-layout: fixed; width: 100%; }
+            .print-table th, .print-table td { border: 1px solid #bbb; height: 2.3mm; line-height: 1; overflow: hidden; padding: 0 0.18mm; text-align: left; white-space: nowrap; }
             .print-table th { background: #f2f2f2; font-weight: 700; }
+            .print-table th:nth-child(1), .print-table td:nth-child(1) { width: ${isRepeated ? "36%" : "38%"}; }
+            .print-table th:nth-child(2), .print-table td:nth-child(2) { width: ${isRepeated ? "48%" : "62%"}; }
+            .print-table th:nth-child(3), .print-table td:nth-child(3) { width: 16%; }
             .empty { border: 1px solid #bbb; font-size: 8px; padding: 6px; }
             @media screen {
               body { padding: 24px; }
-              .print-report { max-width: 760px; }
+              .print-report { max-width: 1120px; }
             }
           </style>
         </head>

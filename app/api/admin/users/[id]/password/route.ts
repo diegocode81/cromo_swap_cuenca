@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/auth";
 import { badRequest, json } from "@/lib/http";
 import { prisma, withPrismaRetry } from "@/lib/prisma";

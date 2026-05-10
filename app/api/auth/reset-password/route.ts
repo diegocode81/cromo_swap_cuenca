@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { badRequest, json } from "@/lib/http";
 import { hashResetToken } from "@/lib/password-reset";
