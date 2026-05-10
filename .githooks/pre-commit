@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+if [ "$SKIP_ANDROID_RELEASE" = "1" ]; then
+  exit 0
+fi
+
+npm run android:release-apk
