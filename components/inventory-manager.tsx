@@ -76,7 +76,7 @@ export function InventoryManager({
     .filter((sticker) => {
       const q = query.trim().toLowerCase();
       if (!q) return true;
-      if (/[a-z]/i.test(q) && q.length < 3) return true;
+      if (/[a-z]/i.test(q) && q.length < 2) return true;
       return (
         String(sticker.number) === q ||
         sticker.code.toLowerCase() === q ||
