@@ -1,5 +1,5 @@
-const CACHE_NAME = "cromoswap-shell-v1";
-const APP_SHELL = ["/", "/login", "/manifest.webmanifest", "/icon.svg"];
+const CACHE_NAME = "cromoswap-shell-v2";
+const APP_SHELL = ["/", "/login", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
