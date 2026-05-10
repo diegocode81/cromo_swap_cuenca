@@ -76,11 +76,12 @@ export function InventoryManager({
     .filter((sticker) => {
       const q = query.trim().toLowerCase();
       if (!q) return true;
+      if (/[a-z]/i.test(q) && q.length < 3) return true;
       return (
-        String(sticker.number).includes(q) ||
-        sticker.code.toLowerCase().includes(q) ||
-        sticker.name.toLowerCase().includes(q) ||
-        sticker.section.toLowerCase().includes(q)
+        String(sticker.number) === q ||
+        sticker.code.toLowerCase() === q ||
+        sticker.name.toLowerCase() === q ||
+        sticker.section.toLowerCase() === q
       );
     })
     .filter((sticker) => {
