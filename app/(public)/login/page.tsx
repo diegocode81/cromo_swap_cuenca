@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LoginForm } from "@/components/auth-forms";
+import { PwaInstallButton } from "@/components/pwa-install-button";
 
 export default function LoginPage({ searchParams }: { searchParams: { reset?: string } }) {
   return (
@@ -12,6 +13,7 @@ export default function LoginPage({ searchParams }: { searchParams: { reset?: st
         </p>
       ) : null}
       <LoginForm />
+      <PwaInstallButton />
       <p className="mt-5 text-center text-sm">
         No tienes cuenta?{" "}
         <Link href="/register" className="font-semibold text-field">

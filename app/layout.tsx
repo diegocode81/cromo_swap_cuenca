@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Providers } from "@/components/providers";
@@ -6,7 +6,21 @@ import { SafetyBanner } from "@/components/safety-banner";
 
 export const metadata: Metadata = {
   title: "CromoSwap Cuenca",
-  description: "Intercambia cromos con personas de Cuenca de forma organizada y segura."
+  description: "Intercambia cromos con personas de Cuenca de forma organizada y segura.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg"
+  },
+  appleWebApp: {
+    capable: true,
+    title: "CromoSwap",
+    statusBarStyle: "default"
+  }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2f855f"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
