@@ -1,12 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#19302b"/>
-  <circle cx="48" cy="16" r="7" fill="#f4b63f"/>
-  <path d="M48 9c-4.1 0-7.4 3.3-7.4 7.4 0 5.2 7.4 12.1 7.4 12.1s7.4-6.9 7.4-12.1C55.4 12.3 52.1 9 48 9Zm0 10.2a2.8 2.8 0 1 1 0-5.6 2.8 2.8 0 0 1 0 5.6Z" fill="#2f855f"/>
-  <rect x="12" y="11" width="25" height="34" rx="4" fill="#ffffff" transform="rotate(-8 24.5 28)"/>
-  <rect x="18" y="18" width="25" height="34" rx="4" fill="#e9f7ef" stroke="#ffffff" stroke-width="3" transform="rotate(8 30.5 35)"/>
-  <path d="M23 38h22v9H23z" fill="#2f855f" transform="rotate(8 34 42.5)"/>
-  <path d="M24 38 30 31l5 5 3-4 6 7" fill="none" stroke="#19302b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M19 50h18" stroke="#f4b63f" stroke-width="4" stroke-linecap="round"/>
-  <path d="M42 34h8l-3-3m3 3-3 3" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M22 22h-8l3-3m-3 3 3 3" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="bg" x1="8" y1="4" x2="56" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00a878"/>
+      <stop offset=".45" stop-color="#1f8fff"/>
+      <stop offset="1" stop-color="#ff4f8b"/>
+    </linearGradient>
+    <linearGradient id="album" x1="15" y1="12" x2="49" y2="53" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff7d6"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <circle cx="12" cy="12" r="5" fill="#ffd23f"/>
+  <circle cx="53" cy="16" r="4" fill="#ff8a00"/>
+  <circle cx="52" cy="51" r="5" fill="#7cf6c3"/>
+  <path d="M15 15.5c0-3 2.6-5.4 5.6-5.1l24.6 2.9a5.4 5.4 0 0 1 4.8 5.4v28.8a5.4 5.4 0 0 1-6.1 5.3l-24.6-3.3a5.4 5.4 0 0 1-4.7-5.3V15.5Z" fill="#0f6b55" opacity=".28"/>
+  <path d="M12 17c0-3.1 2.9-5.5 6-4.8l29 6.1a5.5 5.5 0 0 1 4.4 5.4v25.9c0 3.5-3.3 6.1-6.7 5.3l-29-6.8a5.5 5.5 0 0 1-4.2-5.3V17Z" fill="#fff" opacity=".95"/>
+  <path d="M17.5 14.4 47 20.6v28.8l-29.5-6.9V14.4Z" fill="url(#album)"/>
+  <path d="M21 19.4 33.8 22v9.5L21 28.8v-9.4Z" fill="#dff3ff"/>
+  <path d="M36.8 22.7 44 24.2v9.5l-7.2-1.5v-9.5Z" fill="#ffe6ef"/>
+  <path d="M21 32.4 28.3 34v7.5L21 39.8v-7.4Z" fill="#fff0b8"/>
+  <path d="M31.2 34.6 44 37.4v7.4l-12.8-3v-7.2Z" fill="#dffbe9"/>
+  <path d="M22.6 27.1 27 23l3.2 4 2-2.1 3.2 5.4-12.8-2.6v-.6Z" fill="#00a878"/>
+  <circle cx="41" cy="27.8" r="2.3" fill="#ffbf2f"/>
+  <path d="M18 51.4c5.3 2.3 15.7 4.3 22.1 3.9" stroke="#ffd23f" stroke-width="4.8" stroke-linecap="round"/>
+  <path d="M43.8 14.6c1.2-3.4 4.2-5.7 7.7-5.7-2.8 1.9-4.2 4.4-4.3 7.7l-3.4-2Z" fill="#7cf6c3"/>
+  <path d="m46.7 9.6 5.2 5.7" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M10.5 12.5c4.6 2.1 7.5 5.1 9 9.7" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
 </svg>

@@ -1,12 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="128" fill="#19302b"/>
-  <circle cx="384" cy="128" r="56" fill="#f4b63f"/>
-  <path d="M384 72c-32.8 0-59.2 26.4-59.2 59.2 0 41.6 59.2 96.8 59.2 96.8s59.2-55.2 59.2-96.8C443.2 98.4 416.8 72 384 72Zm0 81.6a22.4 22.4 0 1 1 0-44.8 22.4 22.4 0 0 1 0 44.8Z" fill="#2f855f"/>
-  <rect x="96" y="88" width="200" height="272" rx="32" fill="#ffffff" transform="rotate(-8 196 224)"/>
-  <rect x="144" y="144" width="200" height="272" rx="32" fill="#e9f7ef" stroke="#ffffff" stroke-width="24" transform="rotate(8 244 280)"/>
-  <path d="M184 304h176v72H184z" fill="#2f855f" transform="rotate(8 272 340)"/>
-  <path d="M192 304 240 248l40 40 24-32 48 56" fill="none" stroke="#19302b" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M152 400h144" stroke="#f4b63f" stroke-width="32" stroke-linecap="round"/>
-  <path d="M336 272h64l-24-24m24 24-24 24" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M176 176h-64l24-24m-24 24 24 24" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="32" x2="448" y2="496" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00a878"/>
+      <stop offset=".45" stop-color="#1f8fff"/>
+      <stop offset="1" stop-color="#ff4f8b"/>
+    </linearGradient>
+    <linearGradient id="album" x1="120" y1="96" x2="392" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff7d6"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <circle cx="96" cy="96" r="40" fill="#ffd23f"/>
+  <circle cx="424" cy="128" r="32" fill="#ff8a00"/>
+  <circle cx="416" cy="408" r="40" fill="#7cf6c3"/>
+  <path d="M120 124c0-24 20.8-43.2 44.8-40.8l196.8 23.2a43.2 43.2 0 0 1 38.4 43.2v230.4a43.2 43.2 0 0 1-48.8 42.4l-196.8-26.4a43.2 43.2 0 0 1-37.6-42.4V124Z" fill="#0f6b55" opacity=".28"/>
+  <path d="M96 136c0-24.8 23.2-44 48-38.4l232 48.8a44 44 0 0 1 35.2 43.2v207.2c0 28-26.4 48.8-53.6 42.4l-232-54.4A44 44 0 0 1 92 342.4V136Z" fill="#fff" opacity=".95"/>
+  <path d="M140 115.2 376 164.8v230.4l-236-55.2V115.2Z" fill="url(#album)"/>
+  <path d="M168 155.2 270.4 176v76L168 230.4v-75.2Z" fill="#dff3ff"/>
+  <path d="M294.4 181.6 352 193.6v76l-57.6-12v-76Z" fill="#ffe6ef"/>
+  <path d="M168 259.2 226.4 272v60L168 318.4v-59.2Z" fill="#fff0b8"/>
+  <path d="M249.6 276.8 352 299.2v59.2l-102.4-24v-57.6Z" fill="#dffbe9"/>
+  <path d="M180.8 216.8 216 184l25.6 32 16-16.8 25.6 43.2-102.4-20.8v-4.8Z" fill="#00a878"/>
+  <circle cx="328" cy="222.4" r="18.4" fill="#ffbf2f"/>
+  <path d="M144 411.2c42.4 18.4 125.6 34.4 176.8 31.2" stroke="#ffd23f" stroke-width="38.4" stroke-linecap="round"/>
+  <path d="M350.4 116.8c9.6-27.2 33.6-45.6 61.6-45.6-22.4 15.2-33.6 35.2-34.4 61.6l-27.2-16Z" fill="#7cf6c3"/>
+  <path d="m373.6 76.8 41.6 45.6" stroke="#ffffff" stroke-width="17.6" stroke-linecap="round"/>
+  <path d="M84 100c36.8 16.8 60 40.8 72 77.6" stroke="#ffffff" stroke-width="17.6" stroke-linecap="round" opacity=".85"/>
 </svg>
