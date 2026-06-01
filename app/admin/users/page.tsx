@@ -35,7 +35,7 @@ export default async function AdminUsersPage({
         city: true,
         role: true,
         isActive: true,
-        _count: { select: { stickers: true, messages: true, reportsGot: true } }
+        _count: { select: { stickers: true, reportsGot: true } }
       }
     }),
     prisma.user.count({ where })
@@ -62,7 +62,7 @@ export default async function AdminUsersPage({
                 <p className="text-sm text-slate-600">{user.email}</p>
                 <p className="text-sm text-slate-600">{user.city} · {user.role}</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  {user._count.stickers} cromos · {user._count.messages} mensajes · {user._count.reportsGot} reportes
+                  {user._count.stickers} cromos · {user._count.reportsGot} reportes
                 </p>
               </div>
               {user.role !== "ADMIN" ? (

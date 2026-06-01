@@ -15,22 +15,6 @@ export async function POST(request: Request) {
     });
     if (!reportedUser) return json({ error: "Usuario reportado no encontrado" }, { status: 404 });
 
-    if (data.conversationId) {
-      const conversation = await prisma.conversation.findFirst({
-        where: {
-          id: data.conversationId,
-          OR: [{ userAId: user.id }, { userBId: user.id }]
-        },
-        select: { userAId: true, userBId: true }
-      });
-      const isReportedParticipant =
-        conversation?.userAId === data.reportedUserId || conversation?.userBId === data.reportedUserId;
-
-      if (!conversation || !isReportedParticipant) {
-        return json({ error: "Conversacion invalida para este reporte" }, { status: 400 });
-      }
-    }
-
     const report = await prisma.report.create({ data: { ...data, reporterId: user.id } });
     return json({ report }, { status: 201 });
   } catch (error) {

@@ -4,10 +4,10 @@ export default function HomePage() {
   return (
     <section className="grid min-h-[70vh] items-center gap-8 md:grid-cols-[1.1fr_0.9fr]">
       <div>
-        <p className="mb-3 font-semibold text-field">Comunidad de coleccionistas en Cuenca</p>
+        <p className="mb-3 font-semibold text-field">Comunidad de coleccionistas por ciudad</p>
         <h1 className="text-4xl font-black leading-tight sm:text-5xl">CromoSwap Cuenca</h1>
         <p className="mt-4 max-w-xl text-lg text-slate-700">
-          Intercambia cromos con personas de Cuenca de forma organizada y segura.
+          Intercambia cromos con personas de tu ciudad de forma organizada y segura.
         </p>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <Link href="/register" className="btn-primary">

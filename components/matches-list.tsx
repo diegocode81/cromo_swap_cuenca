@@ -1,7 +1,3 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-
 type StickerInfo = { id: string; number: number; code: string; name: string; section: string };
 type Match = {
   id: string;
@@ -16,19 +12,6 @@ type Match = {
 };
 
 export function MatchesList({ matches, currentUserId }: { matches: Match[]; currentUserId: string }) {
-  const router = useRouter();
-
-  async function startChat(matchId: string) {
-    const response = await fetch("/api/conversations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ exchangeMatchId: matchId })
-    });
-    if (!response.ok) return;
-    const data = await response.json();
-    router.push(`/chat/${data.conversation.id}`);
-  }
-
   if (matches.length === 0) {
     return <div className="card text-slate-600">Aun no hay intercambios sugeridos. Registra repetidos y faltantes.</div>;
   }
@@ -56,9 +39,6 @@ export function MatchesList({ matches, currentUserId }: { matches: Match[]; curr
               <p className="label">Tu puedes dar</p>
               <p className="text-sm">{iGive.length ? iGive.map((s) => `${s.code} ${s.number}`).join(", ") : "Sin cromos en esta direccion"}</p>
             </div>
-            <button className="btn-primary w-full" onClick={() => startChat(match.id)}>
-              Enviar mensaje
-            </button>
           </article>
         );
       })}

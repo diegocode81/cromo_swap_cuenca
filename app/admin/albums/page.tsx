@@ -7,7 +7,7 @@ export default async function AdminAlbumsPage() {
   const albums = await prisma.album.findMany({
     include: {
       stickers: { select: { code: true, section: true }, orderBy: [{ code: "asc" }, { number: "asc" }] },
-      _count: { select: { stickers: true, matches: true, userStickers: true, conversations: true } }
+      _count: { select: { stickers: true, matches: true, userStickers: true } }
     },
     orderBy: { createdAt: "desc" }
   });
@@ -24,7 +24,7 @@ export default async function AdminAlbumsPage() {
     return {
       ...album,
       isEffectivelyActive: album.status === "ACTIVE" && album.isActive,
-      hasCommunityData: album._count.userStickers + album._count.matches + album._count.conversations > 0,
+      hasCommunityData: album._count.userStickers + album._count.matches > 0,
       sectionsText: Array.from(sectionCounts.values())
         .map((section) => `${section.code},${section.section},${section.count}`)
         .join("\n")

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { PasswordInput } from "@/components/password-input";
+import { CITIES } from "@/lib/cities";
 
 export function LoginForm() {
   const router = useRouter();
@@ -156,7 +157,7 @@ export function RegisterForm() {
         name: form.get("name"),
         email: form.get("email"),
         password: form.get("password"),
-        city: "Cuenca"
+        city: form.get("city")
       })
     });
     if (!response.ok) {
@@ -187,7 +188,16 @@ export function RegisterForm() {
       </div>
       <div>
         <label className="label">Ciudad</label>
-        <input value="Cuenca" readOnly />
+        <select name="city" required defaultValue="">
+          <option value="" disabled>
+            Selecciona tu ciudad
+          </option>
+          {CITIES.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <button className="btn-primary w-full" type="submit">

@@ -7,7 +7,6 @@ const userLinks = [
   ["Inicio", "/dashboard"],
   ["Album", "/album"],
   ["Matches", "/matches"],
-  ["Chat", "/chat"],
   ["Perfil", "/profile"]
 ];
 

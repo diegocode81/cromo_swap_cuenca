@@ -1,12 +1,14 @@
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/auth";
 import { badRequest, json, notFound } from "@/lib/http";
+import { CITIES } from "@/lib/cities";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const schema = z.object({
   isActive: z.boolean().optional(),
   role: z.enum(["USER", "ADMIN"]).optional(),
+  city: z.enum(CITIES).optional(),
   password: z.string().min(8).max(80).optional()
 });
 
@@ -40,7 +42,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         ...rest,
         ...(password ? { passwordHash: await bcrypt.hash(password, 12) } : {})
       },
-      select: { id: true, name: true, email: true, role: true, isActive: true }
+      select: { id: true, name: true, email: true, city: true, role: true, isActive: true }
     });
     return json({ user });
   } catch (error) {

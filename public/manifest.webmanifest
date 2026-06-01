@@ -1,7 +1,7 @@
 {
   "name": "CromoSwap Cuenca",
   "short_name": "CromoSwap",
-  "description": "Intercambia cromos con personas de Cuenca de forma organizada y segura.",
+  "description": "Intercambia cromos con personas de tu ciudad de forma organizada y segura.",
   "start_url": "/login",
   "scope": "/",
   "display": "standalone",

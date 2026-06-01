@@ -230,7 +230,7 @@ export function EditAlbumForm({
       </div>
       {album.hasCommunityData && album.canRegenerateCatalog ? (
         <p className="text-sm text-slate-600">
-          Como el album esta en borrador, al guardar se limpiaran inventarios, matches y chats de este album antes de
+          Como el album esta en borrador, al guardar se limpiaran inventarios y matches de este album antes de
           regenerar el catalogo.
         </p>
       ) : null}
@@ -375,7 +375,7 @@ export function DeleteAlbumButton({ albumId, albumName }: { albumId: string; alb
 
   async function remove() {
     const confirmed = window.confirm(
-      `Eliminar ${albumName}? Se borraran cromos, inventarios, matches, chats, mensajes y reportes relacionados con este album. Tambien se eliminaran cuentas USER que solo tengan actividad en este album.`
+      `Eliminar ${albumName}? Se borraran cromos, inventarios y matches relacionados con este album. Tambien se eliminaran cuentas USER que solo tengan actividad en este album.`
     );
     if (!confirmed) return;
     const response = await fetch(`/api/admin/albums/${albumId}`, { method: "DELETE" });

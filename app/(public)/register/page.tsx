@@ -5,7 +5,7 @@ export default function RegisterPage() {
   return (
     <section className="py-8">
       <h1 className="mb-2 text-center text-3xl font-black">Crear cuenta</h1>
-      <p className="mb-6 text-center text-slate-600">Solo para intercambios comunitarios en Cuenca.</p>
+      <p className="mb-6 text-center text-slate-600">Selecciona tu ciudad para encontrar intercambios locales.</p>
       <RegisterForm />
       <p className="mt-5 text-center text-sm">
         Ya tienes cuenta?{" "}

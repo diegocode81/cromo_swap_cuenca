@@ -7,7 +7,7 @@ import { SafetyBanner } from "@/components/safety-banner";
 
 export const metadata: Metadata = {
   title: "CromoSwap Cuenca",
-  description: "Intercambia cromos con personas de Cuenca de forma organizada y segura.",
+  description: "Intercambia cromos con personas de tu ciudad de forma organizada y segura.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icon.svg",

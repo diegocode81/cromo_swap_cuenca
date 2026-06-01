@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { CITIES } from "@/lib/cities";
 
 export function ProfileForm({ user }: { user: { name: string; email: string; city: string } }) {
   const [saved, setSaved] = useState(false);
@@ -11,7 +12,7 @@ export function ProfileForm({ user }: { user: { name: string; email: string; cit
     const response = await fetch("/api/users/me", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: form.get("name") })
+      body: JSON.stringify({ name: form.get("name"), city: form.get("city") })
     });
     setSaved(response.ok);
   }
@@ -28,7 +29,13 @@ export function ProfileForm({ user }: { user: { name: string; email: string; cit
       </div>
       <div>
         <label className="label">Ciudad</label>
-        <input value={user.city} readOnly />
+        <select name="city" defaultValue={user.city} required>
+          {CITIES.map((city) => (
+            <option key={city} value={city}>
+              {city}
+            </option>
+          ))}
+        </select>
       </div>
       {saved ? <p className="text-sm font-semibold text-field">Perfil actualizado.</p> : null}
       <button className="btn-primary" type="submit">Guardar cambios</button>

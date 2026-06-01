@@ -1,11 +1,19 @@
 import { z } from "zod";
-import { CITY } from "@/lib/zones";
+import { CITIES, isValidCity, normalizeCity } from "@/lib/cities";
+
+const citySchema = z
+  .string()
+  .transform((value) => normalizeCity(value))
+  .refine((value) => value.length > 0, "La ciudad es obligatoria")
+  .refine((value) => isValidCity(value), {
+    message: `Ciudad invalida. Opciones permitidas: ${CITIES.join(", ")}`
+  });
 
 export const registerSchema = z.object({
   name: z.string().min(2).max(80),
   email: z.string().email().max(160).toLowerCase(),
   password: z.string().min(8).max(80),
-  city: z.literal(CITY)
+  city: citySchema
 });
 
 export const loginSchema = z.object({
@@ -29,7 +37,8 @@ export const resetPasswordSchema = z
   });
 
 export const profileSchema = z.object({
-  name: z.string().min(2).max(80)
+  name: z.string().min(2).max(80),
+  city: citySchema
 });
 
 export const albumSchema = z
@@ -69,18 +78,7 @@ export const userStickerSchema = z.object({
   quantity: z.coerce.number().int().min(1).max(99).default(1)
 });
 
-export const conversationSchema = z.object({
-  userId: z.string().optional(),
-  exchangeMatchId: z.string().optional()
-});
-
-export const messageSchema = z.object({
-  conversationId: z.string(),
-  content: z.string().min(1).max(1000)
-});
-
 export const reportSchema = z.object({
   reportedUserId: z.string(),
-  conversationId: z.string().optional(),
   reason: z.string().min(5).max(1000)
 });

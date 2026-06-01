@@ -24,7 +24,6 @@ export const config = {
     "/repeated/:path*",
     "/missing/:path*",
     "/matches/:path*",
-    "/chat/:path*",
     "/profile/:path*",
     "/admin/:path*"
   ]

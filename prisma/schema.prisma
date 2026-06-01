@@ -52,9 +52,6 @@ model User {
   stickers            UserSticker[]
   matchesAsA          ExchangeMatch[]      @relation("MatchUserA")
   matchesAsB          ExchangeMatch[]      @relation("MatchUserB")
-  chatsAsA            Conversation[]       @relation("ConversationUserA")
-  chatsAsB            Conversation[]       @relation("ConversationUserB")
-  messages            Message[]
   reportsMade         Report[]             @relation("ReportsMade")
   reportsGot          Report[]             @relation("ReportsGot")
   passwordResetTokens PasswordResetToken[]
@@ -87,7 +84,6 @@ model Album {
   stickers      Sticker[]
   userStickers  UserSticker[]
   matches       ExchangeMatch[]
-  conversations Conversation[]
 
   @@index([isActive])
   @@index([status])
@@ -144,57 +140,20 @@ model ExchangeMatch {
   album            Album          @relation(fields: [albumId], references: [id], onDelete: Cascade)
   userA            User           @relation("MatchUserA", fields: [userAId], references: [id], onDelete: Cascade)
   userB            User           @relation("MatchUserB", fields: [userBId], references: [id], onDelete: Cascade)
-  conversations    Conversation[]
 
   @@unique([albumId, userAId, userBId])
   @@index([albumId, score])
-}
-
-model Conversation {
-  id              String         @id @default(cuid())
-  albumId         String?
-  exchangeMatchId String?
-  userAId         String
-  userBId         String
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  album           Album?         @relation(fields: [albumId], references: [id], onDelete: SetNull)
-  exchangeMatch   ExchangeMatch? @relation(fields: [exchangeMatchId], references: [id], onDelete: SetNull)
-  userA           User           @relation("ConversationUserA", fields: [userAId], references: [id], onDelete: Cascade)
-  userB           User           @relation("ConversationUserB", fields: [userBId], references: [id], onDelete: Cascade)
-  messages        Message[]
-  reports         Report[]
-
-  @@unique([userAId, userBId, exchangeMatchId])
-  @@index([userAId, updatedAt])
-  @@index([userBId, updatedAt])
-}
-
-model Message {
-  id             String       @id @default(cuid())
-  conversationId String
-  senderId       String
-  content        String
-  isRead         Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId, createdAt])
-  @@index([senderId])
 }
 
 model Report {
   id             String        @id @default(cuid())
   reporterId     String
   reportedUserId String
-  conversationId String?
   reason         String
   status         ReportStatus  @default(OPEN)
   createdAt      DateTime      @default(now())
   reporter       User          @relation("ReportsMade", fields: [reporterId], references: [id], onDelete: Cascade)
   reportedUser   User          @relation("ReportsGot", fields: [reportedUserId], references: [id], onDelete: Cascade)
-  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
 
   @@index([status, createdAt])
   @@index([reportedUserId])

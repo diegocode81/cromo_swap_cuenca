@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const user = await requireUser();
     const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
-    const [registered, repeated, missing, matches, unreadMessages] = await Promise.all([
+    const [registered, repeated, missing, matches] = await Promise.all([
       activeAlbum
         ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id } })
         : 0,
@@ -27,19 +27,12 @@ export async function GET() {
               OR: [{ userAId: user.id }, { userBId: user.id }]
             }
           })
-        : 0,
-      prisma.message.count({
-        where: {
-          isRead: false,
-          senderId: { not: user.id },
-          conversation: { OR: [{ userAId: user.id }, { userBId: user.id }] }
-        }
-      })
+        : 0
     ]);
 
     return json({
       user: { id: user.id, name: user.name, email: user.email, city: user.city, role: user.role },
-      stats: { registered, repeated, missing, matches, unreadMessages },
+      stats: { registered, repeated, missing, matches },
       activeAlbum
     });
   } catch {
@@ -60,4 +53,8 @@ export async function PATCH(request: Request) {
   } catch (error) {
     return badRequest(error);
   }
+}
+
+export async function PUT(request: Request) {
+  return PATCH(request);
 }

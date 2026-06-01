@@ -6,7 +6,7 @@ import { StatCard } from "@/components/stat-card";
 export default async function DashboardPage() {
   const user = await requireUser();
   const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
-  const [registered, repeated, missing, matches, unreadMessages] = await Promise.all([
+  const [registered, repeated, missing, matches] = await Promise.all([
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id } }) : 0,
     activeAlbum
       ? prisma.userSticker
@@ -16,10 +16,7 @@ export default async function DashboardPage() {
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id, status: "MISSING" } }) : 0,
     activeAlbum
       ? prisma.exchangeMatch.count({ where: { albumId: activeAlbum.id, OR: [{ userAId: user.id }, { userBId: user.id }] } })
-      : 0,
-    prisma.message.count({
-      where: { isRead: false, senderId: { not: user.id }, conversation: { OR: [{ userAId: user.id }, { userBId: user.id }] } }
-    })
+      : 0
   ]);
   const albumProgress = activeAlbum?.totalStickers ? Math.min(100, Math.round((registered / activeAlbum.totalStickers) * 100)) : 0;
 
@@ -75,17 +72,15 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Cromos registrados" value={registered} />
         <StatCard label="Repetidos" value={repeated} />
         <StatCard label="Faltantes" value={missing} />
         <StatCard label="Matches" value={matches} />
-        <StatCard label="Mensajes pendientes" value={unreadMessages} />
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Link className="btn-primary" href="/album">Registrar cromos</Link>
         <Link className="btn-secondary" href="/matches">Ver matches</Link>
-        <Link className="btn-secondary" href="/chat">Abrir chat</Link>
       </div>
     </section>
   );

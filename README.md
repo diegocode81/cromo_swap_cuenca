@@ -1,6 +1,6 @@
 # CromoSwap Cuenca
 
-Plataforma comunitaria gratuita para intercambiar cromos en Cuenca, Ecuador. La primera temporada usa el album Mundial 2026, pero la arquitectura es multi-album y permite reiniciar temporadas sin borrar usuarios, chats, inventarios ni matches historicos.
+Plataforma comunitaria gratuita para intercambiar cromos por ciudad. La primera temporada usa el album Mundial 2026, pero la arquitectura es multi-album y permite reiniciar temporadas sin borrar usuarios, inventarios ni matches historicos.
 
 ## Stack
 
@@ -11,7 +11,6 @@ Plataforma comunitaria gratuita para intercambiar cromos en Cuenca, Ecuador. La 
 - bcrypt para hash de contrasenas
 - Zod para validaciones
 - Vercel Cron Jobs para el agente de intercambios
-- Chat interno persistido con polling simple
 
 ## Instalacion
 
@@ -62,7 +61,7 @@ ECU,Ecuador,20
 GEN,General,40
 ```
 
-Cada codigo reinicia su numeracion desde 1, por ejemplo `HAI 1`, `HAI 2`, `ECU 1`. Al activar un album, el album activo anterior pasa a historico. El catalogo solo se puede regenerar si el album aun no tiene inventarios, matches o chats. Al eliminar un album se borran sus cromos, inventarios, matches, conversaciones, mensajes y reportes relacionados; tambien se eliminan cuentas `USER` que no tengan actividad fuera de ese album.
+Cada codigo reinicia su numeracion desde 1, por ejemplo `HAI 1`, `HAI 2`, `ECU 1`. Al activar un album, el album activo anterior pasa a historico. El catalogo solo se puede regenerar si el album aun no tiene inventarios ni matches. Al eliminar un album se borran sus cromos, inventarios y matches relacionados; tambien se eliminan cuentas `USER` que no tengan actividad fuera de ese album.
 
 ## Desarrollo
 
@@ -101,18 +100,17 @@ npm run build
 - `prisma/schema.prisma`: modelos multi-album y relaciones principales.
 - `lib/auth.ts`: NextAuth credentials, sesiones JWT y helpers `requireUser`/`requireAdmin`.
 - `lib/exchange-agent.ts`: agente server-side que revisa solo el album activo, calcula compatibilidad, evita duplicados y archiva matches obsoletos.
-- `app/api/*`: endpoints para auth, usuarios, albumes, cromos, inventario, matches, chat, reportes, admin y cron.
+- `app/api/*`: endpoints para auth, usuarios, albumes, cromos, inventario, matches, reportes, admin y cron.
 - `components/*`: formularios y pantallas interactivas client-side.
 - `app/*`: rutas frontend protegidas por `middleware.ts`.
 
 ## Reglas importantes
 
-- Solo una ciudad permitida: Cuenca.
+- Cada usuario pertenece a una ciudad.
 - Solo un album activo a la vez.
-- El reinicio de temporada es logico: no borra usuarios, chats, inventarios anteriores ni historial de matches.
+- El reinicio de temporada es logico: no borra usuarios, inventarios anteriores ni historial de matches.
 - Los matches nuevos se generan solo para el album activo.
 - No se muestran telefonos, direcciones exactas ni datos sensibles.
-- El chat no envia mensajes automaticos y no usa WhatsApp como canal principal.
 
 ## Scripts
 

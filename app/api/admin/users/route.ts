@@ -31,7 +31,7 @@ export async function GET(request: Request) {
           role: true,
           isActive: true,
           createdAt: true,
-          _count: { select: { stickers: true, messages: true, reportsGot: true } }
+          _count: { select: { stickers: true, reportsGot: true } }
         },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,

@@ -8,8 +8,7 @@ export async function GET() {
     const reports = await prisma.report.findMany({
       include: {
         reporter: { select: { id: true, name: true, email: true } },
-        reportedUser: { select: { id: true, name: true, email: true, isActive: true } },
-        conversation: true
+        reportedUser: { select: { id: true, name: true, email: true, isActive: true } }
       },
       orderBy: { createdAt: "desc" }
     });
