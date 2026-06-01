@@ -2,11 +2,12 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { StatCard } from "@/components/stat-card";
+import { buildTeamProgress } from "@/lib/team-progress";
 
 export default async function DashboardPage() {
   const user = await requireUser();
   const activeAlbum = await prisma.album.findFirst({ where: { isActive: true, status: "ACTIVE" } });
-  const [registered, repeated, missing, matches] = await Promise.all([
+  const [registered, repeated, missing, matches, stickerGroups, ownedTeamStickers] = await Promise.all([
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id } }) : 0,
     activeAlbum
       ? prisma.userSticker
@@ -16,9 +17,30 @@ export default async function DashboardPage() {
     activeAlbum ? prisma.userSticker.count({ where: { userId: user.id, albumId: activeAlbum.id, status: "MISSING" } }) : 0,
     activeAlbum
       ? prisma.exchangeMatch.count({ where: { albumId: activeAlbum.id, OR: [{ userAId: user.id }, { userBId: user.id }] } })
-      : 0
+      : 0,
+    activeAlbum
+      ? prisma.sticker.groupBy({
+          by: ["code", "section"],
+          where: { albumId: activeAlbum.id },
+          _count: { _all: true }
+        })
+      : [],
+    activeAlbum
+      ? prisma.userSticker.findMany({
+          where: { userId: user.id, albumId: activeAlbum.id, status: { in: ["HAVE", "REPEATED"] } },
+          select: { sticker: { select: { code: true, section: true } } }
+        })
+      : []
   ]);
   const albumProgress = activeAlbum?.totalStickers ? Math.min(100, Math.round((registered / activeAlbum.totalStickers) * 100)) : 0;
+  const teamProgress = buildTeamProgress({
+    teams: stickerGroups.map((group) => ({
+      code: group.code,
+      section: group.section,
+      totalStickers: group._count._all
+    })),
+    ownedStickers: ownedTeamStickers.map((entry) => entry.sticker)
+  });
 
   return (
     <section className="space-y-5">
@@ -55,19 +77,55 @@ export default async function DashboardPage() {
             </div>
           </div>
           <div className="border-t border-emerald-100 bg-[linear-gradient(135deg,#eaf6ff,#f3fbf4)] p-5 md:border-l md:border-t-0">
-            <div className="grid grid-cols-4 gap-2">
-              {Array.from({ length: 12 }, (_, index) => (
-                <div
-                  key={index}
-                  className="aspect-[3/4] rounded-md border border-white/80 bg-white/90 p-2 shadow-sm"
-                >
-                  <div className="h-2 w-8 rounded-full bg-field/80" />
-                  <div className="mt-3 h-7 rounded bg-sky" />
-                  <p className="mt-3 text-center text-[10px] font-black text-field">
-                    {activeAlbum ? index + 1 : "--"}
-                  </p>
+            <div className="rounded-lg border border-white/80 bg-white/90 p-4 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-black uppercase text-field">🏆 Equipos completados</p>
+                  <p className="mt-1 text-3xl font-black text-ink">{teamProgress.completedTeams.length}</p>
                 </div>
-              ))}
+                <span className="rounded-full bg-field px-3 py-1 text-xs font-black text-white">
+                  Completos
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2">
+                  <p className="text-xs font-bold text-slate-600">Equipos iniciados</p>
+                  <p className="text-xl font-black text-field">{teamProgress.startedTeamsCount}</p>
+                </div>
+                <div className="rounded-lg border border-sky/60 bg-sky/40 px-3 py-2">
+                  <p className="text-xs font-bold text-slate-600">Equipos pendientes</p>
+                  <p className="text-xl font-black text-field">{teamProgress.pendingTeamsCount}</p>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-sm font-black text-ink">Lista completada</p>
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-black text-field">
+                    {teamProgress.completedTeams.length} / {teamProgress.teams.length}
+                  </span>
+                </div>
+                {teamProgress.completedTeams.length > 0 ? (
+                  <ul className="max-h-48 space-y-2 overflow-auto pr-1">
+                    {teamProgress.completedTeams.map((team) => (
+                      <li key={`${team.code}-${team.name}`} className="flex items-center justify-between gap-3 rounded-lg border border-emerald-100 bg-white px-3 py-2">
+                        <span className="min-w-0 truncate text-sm font-bold text-ink">
+                          <span className="mr-2">{team.flag ?? "🏁"}</span>
+                          {team.name}
+                        </span>
+                        <span className="rounded-full bg-field px-2 py-0.5 text-[10px] font-black uppercase text-white">
+                          Completo
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-sm font-semibold text-slate-600">
+                    Aun no completas equipos. Registra todos los cromos de un equipo para verlo aqui.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
