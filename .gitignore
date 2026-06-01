@@ -7,6 +7,7 @@ dist
 backups
 *.log
 .vercel
+.vscode
 android/.gradle
 android/build
 android/app/build
