@@ -97,3 +97,35 @@ Restauracion recomendada en un entorno limpio:
 ## Resultado
 
 Backup completado correctamente antes de modificar estructura o funcionalidad.
+
+## Backup adicional antes de agregar celular
+
+Fecha: 2026-06-01
+
+Se genero un backup logico actualizado antes de crear la migracion para `User.phone`.
+
+Archivo principal:
+
+```text
+backups/20260601_232645/cromo_swap_prisma_backup_20260601_232645.json
+```
+
+Copia de schema y migraciones:
+
+```text
+backups/20260601_232645/prisma_schema_and_migrations/
+```
+
+Conteo de registros respaldados:
+
+| Tabla | Registros |
+|---|---:|
+| User | 9 |
+| PasswordResetToken | 1 |
+| Album | 1 |
+| Sticker | 993 |
+| UserSticker | 3035 |
+| ExchangeMatch | 0 |
+| Report | 0 |
+
+Este backup usa el esquema posterior a la eliminacion de chat y anterior a la columna `phone`.

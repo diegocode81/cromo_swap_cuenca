@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CITIES, isValidCity, normalizeCity } from "@/lib/cities";
+import { isValidPhone, normalizePhone } from "@/lib/phone";
 
 const citySchema = z
   .string()
@@ -9,11 +10,18 @@ const citySchema = z
     message: `Ciudad invalida. Opciones permitidas: ${CITIES.join(", ")}`
   });
 
+const phoneSchema = z
+  .string()
+  .refine((value) => value.length > 0, "El celular es obligatorio")
+  .refine((value) => isValidPhone(value), "Ingresa un celular valido")
+  .transform((value) => normalizePhone(value));
+
 export const registerSchema = z.object({
   name: z.string().min(2).max(80),
   email: z.string().email().max(160).toLowerCase(),
   password: z.string().min(8).max(80),
-  city: citySchema
+  city: citySchema,
+  phone: phoneSchema
 });
 
 export const loginSchema = z.object({
@@ -38,7 +46,8 @@ export const resetPasswordSchema = z
 
 export const profileSchema = z.object({
   name: z.string().min(2).max(80),
-  city: citySchema
+  city: citySchema,
+  phone: phoneSchema
 });
 
 export const albumSchema = z

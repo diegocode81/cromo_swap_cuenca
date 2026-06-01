@@ -15,6 +15,7 @@ export type SwapUserInput = {
   id: string;
   name: string;
   city: string | null;
+  phone?: string | null;
   stickers: SwapStickerInput[];
 };
 
@@ -32,6 +33,7 @@ export type SwapMatch = {
   userId: string;
   userName: string;
   city: string;
+  phone: string | null;
   exchangeQuantity: number;
   youGive: SwapStickerMatch[];
   youReceive: SwapStickerMatch[];
@@ -94,6 +96,7 @@ export function buildSwapMatches({ currentUser, candidates, albumStickerIds }: B
         userId: candidate.id,
         userName: candidate.name,
         city: candidate.city ?? "",
+        phone: candidate.phone ?? null,
         exchangeQuantity,
         youGive: youGiveOptions.slice(0, exchangeQuantity),
         youReceive: youReceiveOptions.slice(0, exchangeQuantity)

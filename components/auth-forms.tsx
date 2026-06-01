@@ -157,7 +157,8 @@ export function RegisterForm() {
         name: form.get("name"),
         email: form.get("email"),
         password: form.get("password"),
-        city: form.get("city")
+        city: form.get("city"),
+        phone: form.get("phone")
       })
     });
     if (!response.ok) {
@@ -198,6 +199,10 @@ export function RegisterForm() {
             </option>
           ))}
         </select>
+      </div>
+      <div>
+        <label className="label">Celular</label>
+        <input name="phone" type="tel" required minLength={9} maxLength={20} placeholder="0987654321" />
       </div>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <button className="btn-primary w-full" type="submit">

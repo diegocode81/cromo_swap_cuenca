@@ -26,7 +26,7 @@ export default async function ProfilePage() {
         <StatCard label="Faltantes" value={missing} />
         <StatCard label="Matches" value={matches} />
       </div>
-      <ProfileForm user={{ name: user.name, email: user.email, city: user.city }} />
+      <ProfileForm user={{ name: user.name, email: user.email, city: user.city, phone: user.phone }} />
     </section>
   );
 }

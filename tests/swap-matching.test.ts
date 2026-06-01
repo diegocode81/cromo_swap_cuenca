@@ -16,6 +16,7 @@ function user(data: Partial<SwapUserInput> & { id: string; stickers?: SwapUserIn
     id: data.id,
     name: data.name ?? data.id,
     city: data.city ?? "Cuenca",
+    phone: data.phone ?? null,
     stickers: data.stickers ?? []
   };
 }
@@ -46,6 +47,7 @@ describe("buildSwapMatches", () => {
 
     expect(matches).toHaveLength(1);
     expect(matches[0].exchangeQuantity).toBe(1);
+    expect(matches[0].phone).toBeNull();
     expect(matches[0].youGive.map((item) => item.stickerId)).toEqual(["s1"]);
     expect(matches[0].youReceive.map((item) => item.stickerId)).toEqual(["s2"]);
   });
@@ -130,5 +132,14 @@ describe("buildSwapMatches", () => {
     const matches = buildSwapMatches({ currentUser, candidates: [currentUser, candidate], albumStickerIds });
 
     expect(matches).toHaveLength(0);
+  });
+
+  it("returns the compatible user's phone when available", () => {
+    const currentUser = user({ id: "u1", stickers: [entry("s1", "REPEATED"), entry("s2", "MISSING")] });
+    const candidate = user({ id: "u2", phone: "+593987654321", stickers: [entry("s2", "REPEATED"), entry("s1", "MISSING")] });
+
+    const matches = buildSwapMatches({ currentUser, candidates: [currentUser, candidate], albumStickerIds });
+
+    expect(matches[0].phone).toBe("+593987654321");
   });
 });

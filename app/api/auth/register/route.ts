@@ -14,9 +14,10 @@ export async function POST(request: Request) {
         name: data.name,
         email: data.email,
         passwordHash: await bcrypt.hash(data.password, 12),
-        city: data.city
+        city: data.city,
+        phone: data.phone
       },
-      select: { id: true, name: true, email: true }
+      select: { id: true, name: true, email: true, city: true, phone: true }
     });
 
     return json({ user }, { status: 201 });

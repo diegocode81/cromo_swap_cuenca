@@ -27,6 +27,7 @@ export async function GET() {
           id: true,
           name: true,
           city: true,
+          phone: true,
           stickers: {
             where: { albumId: album.id, status: { in: ["HAVE", "REPEATED", "MISSING"] } },
             include: { sticker: true }
@@ -44,7 +45,7 @@ export async function GET() {
       albumStickerIds: stickers.map((sticker) => sticker.id)
     });
 
-    return json({ matches, album: { id: album.id, name: album.name }, city: user.city });
+    return json({ matches, album: { id: album.id, name: album.name }, city: user.city, currentUserHasPhone: Boolean(user.phone) });
   } catch (error) {
     if (error instanceof Error && error.message === "USER_CITY_REQUIRED") {
       return json({ error: "Tu usuario no tiene ciudad configurada." }, { status: 400 });
