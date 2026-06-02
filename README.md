@@ -228,6 +228,7 @@ npm run android:bundle
 npm run android:apk-debug
 npm run android:sync
 npm run android:create-keystore
+npm run db:cities:seed
 npm run prisma:migrate
 npm run prisma:seed
 npm run test

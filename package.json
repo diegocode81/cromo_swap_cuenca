@@ -16,6 +16,7 @@
     "android:apk-debug": "cap sync android && cd android && ./gradlew assembleDebug",
     "android:create-keystore": "node scripts/create-android-keystore.mjs",
     "android:release-apk": "node scripts/prepare-android-release.mjs",
+    "db:cities:seed": "tsx scripts/seed-cities.ts",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",
     "test": "vitest run"

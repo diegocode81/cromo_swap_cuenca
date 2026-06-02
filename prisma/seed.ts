@@ -1,49 +1,13 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
-import { INITIAL_CITIES, normalizeCityText, toCitySlug } from "../lib/city-catalog";
+import { preserveExistingUserCities, seedCities } from "../lib/city-seed";
 
 const prisma = new PrismaClient();
 
 async function main() {
   await prisma.$transaction(async (tx) => {
-    for (const city of INITIAL_CITIES) {
-      const slug = city.slug ?? toCitySlug(city.name);
-      await tx.city.upsert({
-        where: { slug },
-        update: {
-          name: city.name,
-          province: city.province
-        },
-        create: {
-          name: city.name,
-          province: city.province,
-          slug,
-          isActive: true
-        }
-      });
-    }
-
-    const existingUserCities = await tx.user.findMany({
-      distinct: ["city"],
-      where: { city: { not: "" } },
-      select: { city: true }
-    });
-
-    for (const entry of existingUserCities) {
-      const name = normalizeCityText(entry.city);
-      if (!name) continue;
-
-      await tx.city.upsert({
-        where: { slug: toCitySlug(name) },
-        update: {},
-        create: {
-          name,
-          province: "Sin definir",
-          slug: toCitySlug(name),
-          isActive: true
-        }
-      });
-    }
+    await seedCities(tx);
+    await preserveExistingUserCities(tx);
 
     const mundialSections = [
       ["HAI", "Haiti", 20],

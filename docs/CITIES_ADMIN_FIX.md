@@ -45,8 +45,7 @@ Luego aplicar la migracion y poblar el catalogo:
 
 ```bash
 npx prisma migrate deploy
-npm run prisma:seed
+npm run db:cities:seed
 ```
 
 La migracion es no destructiva: crea la tabla `cities` y no modifica ni borra usuarios existentes. `User.city` sigue siendo texto para mantener compatibilidad con el matching actual.
-

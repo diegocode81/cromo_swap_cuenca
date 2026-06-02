@@ -36,7 +36,13 @@ La migracion no borra usuarios, cromos, albumes ni matches.
 
 El catalogo inicial vive en `lib/city-catalog.ts` y se carga desde `prisma/seed.ts`.
 
-Para ejecutar:
+Para ejecutar solo el catalogo de ciudades:
+
+```bash
+npm run db:cities:seed
+```
+
+Para ejecutar el seed general del proyecto:
 
 ```bash
 npm run prisma:seed
@@ -78,10 +84,59 @@ Si la migracion no esta aplicada y falta la tabla `cities`, la pantalla muestra 
 
 Antes de aplicar cambios en produccion, verificar o generar backup actualizado.
 
-Luego:
+Vercel no ejecuta migraciones ni seeds automaticamente. `vercel.json` solo define el cron del agente de intercambios, por lo que el catalogo queda vacio hasta ejecutar estos pasos contra la base de produccion.
+
+### Opcion A: comandos contra produccion
+
+Configurar `DATABASE_URL` y `DIRECT_URL` apuntando a produccion y ejecutar:
 
 ```bash
 npx prisma migrate deploy
-npm run prisma:seed
+npm run db:cities:seed
 ```
 
+Respuesta esperada del seed en una base sin ciudades:
+
+```json
+{
+  "created": 221,
+  "updated": 0,
+  "total": 221
+}
+```
+
+Si se ejecuta de nuevo, no duplica registros; las entradas existentes contaran como `updated`.
+
+### Opcion B: endpoint protegido en Vercel
+
+Aplicar primero la migracion:
+
+```bash
+npx prisma migrate deploy
+```
+
+Luego ejecutar el seed por endpoint protegido:
+
+```bash
+curl -X POST "https://TU_DOMINIO/api/admin/cities/seed" \
+  -H "Authorization: Bearer $CITIES_SEED_TOKEN"
+```
+
+Requisitos:
+
+- Definir `CITIES_SEED_TOKEN` en variables de entorno de Vercel, o
+- Ejecutar el endpoint con una sesion de usuario administrador.
+
+El endpoint no esta abierto publicamente. Sin token valido o sesion admin responde `403`.
+
+Si la tabla `cities` no existe, responde `503` indicando que primero debe aplicarse la migracion.
+
+## Validacion rapida
+
+Despues de ejecutar migracion y seed:
+
+```bash
+curl "https://TU_DOMINIO/api/cities"
+```
+
+Debe devolver ciudades activas ordenadas alfabeticamente, incluyendo `Cuenca — Azuay`.
