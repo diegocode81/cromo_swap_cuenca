@@ -1,7 +1,7 @@
 {
-  "versionName": "3.2.0",
-  "versionCode": 10,
+  "versionName": "3.3.0",
+  "versionCode": 11,
   "apkUrl": "/downloads/cromoswap-cuenca.apk",
   "required": false,
-  "notes": "Actualizacion 3.2.0 (minor)."
+  "notes": "Actualizacion 3.3.0 (minor)."
 }
