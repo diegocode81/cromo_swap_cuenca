@@ -7,17 +7,18 @@ const prisma = new PrismaClient();
 async function main() {
   await prisma.$transaction(async (tx) => {
     for (const city of INITIAL_CITIES) {
+      const slug = city.slug ?? toCitySlug(city.name);
       await tx.city.upsert({
-        where: { slug: toCitySlug(city.name) },
+        where: { slug },
         update: {
           name: city.name,
-          province: city.province,
-          isActive: true
+          province: city.province
         },
         create: {
           name: city.name,
           province: city.province,
-          slug: toCitySlug(city.name)
+          slug,
+          isActive: true
         }
       });
     }

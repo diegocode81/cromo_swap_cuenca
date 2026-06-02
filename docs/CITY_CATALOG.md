@@ -18,7 +18,9 @@ La migracion no modifica ni borra usuarios existentes.
 
 ## Seed
 
-`prisma/seed.ts` inserta un catalogo inicial de ciudades/cantones de Ecuador, ordenado alfabeticamente por nombre, y tambien preserva ciudades ya existentes en usuarios como entradas activas con provincia `Sin definir` si no estan en el catalogo inicial.
+`prisma/seed.ts` inserta un catalogo inicial de 221 ciudades/cantones de Ecuador, ordenado alfabeticamente por nombre, y tambien preserva ciudades ya existentes en usuarios como entradas activas con provincia `Sin definir` si no estan en el catalogo inicial.
+
+El seed es idempotente: no duplica ciudades, actualiza `name` y `province` si cambia el catalogo, y no reactiva ciudades que el administrador haya desactivado manualmente.
 
 ## Compatibilidad
 
@@ -29,4 +31,3 @@ Las ciudades inactivas no aparecen en registro ni como nueva opcion de perfil, p
 ## Backup
 
 Antes de aplicar esta migracion en produccion, generar o verificar un backup actualizado de la base. El repositorio ya documenta backups previos en `docs/BACKUP_REPORT.md`, pero esta migracion no fue aplicada desde Codex contra la base remota.
-
