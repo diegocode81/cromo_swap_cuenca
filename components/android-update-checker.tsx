@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import { Capacitor } from "@capacitor/core";
 import { Browser } from "@capacitor/browser";
 
+/**
+ * Feature flag: controla si se activa el chequeo de actualización manual de APK.
+ *
+ * - En producción Google Play debe estar en FALSE (la tienda gestiona actualizaciones).
+ * - Poner en TRUE solo para distribución manual de APK fuera de Google Play.
+ *
+ * Variable de entorno: NEXT_PUBLIC_ENABLE_APK_UPDATE_CHECK=true|false
+ */
+const APK_UPDATE_CHECK_ENABLED =
+  process.env.NEXT_PUBLIC_ENABLE_APK_UPDATE_CHECK === "true";
+
 type AndroidVersion = {
   versionName: string;
   versionCode: number;
@@ -20,7 +31,6 @@ type CapacitorAppInfo = {
 function resolveApkUrl(apkUrl: string): string {
   if (!apkUrl) return "";
   if (apkUrl.startsWith("http")) return apkUrl;
-  // El servidor remoto de Capacitor es https://cromoswapcuenca.vercel.app
   const origin =
     typeof window !== "undefined"
       ? window.location.origin
@@ -35,6 +45,10 @@ export function AndroidUpdateChecker() {
   const [isOpening, setIsOpening] = useState(false);
 
   useEffect(() => {
+    // Si el feature flag está desactivado, no hacer nada.
+    // En Google Play el sistema gestiona las actualizaciones.
+    if (!APK_UPDATE_CHECK_ENABLED) return;
+
     let isMounted = true;
 
     async function checkVersion() {
@@ -66,7 +80,8 @@ export function AndroidUpdateChecker() {
     };
   }, []);
 
-  if (!latestVersion) return null;
+  // Si el flag está desactivado o no hay nueva versión, no renderizar nada.
+  if (!APK_UPDATE_CHECK_ENABLED || !latestVersion) return null;
 
   async function handleUpdatePress() {
     if (!latestVersion || isOpening) return;
@@ -75,7 +90,6 @@ export function AndroidUpdateChecker() {
 
     console.log("[CromoSwap] Actualizar APK presionado");
 
-    // Validar URL
     if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
       console.error("[CromoSwap] URL de descarga inválida o vacía:", url);
       setDownloadError(true);
@@ -88,19 +102,16 @@ export function AndroidUpdateChecker() {
 
     try {
       if (Capacitor.isNativePlatform()) {
-        // Entorno Android nativo: usar Capacitor Browser (abre Chrome Custom Tab)
         console.log("[CromoSwap] Entorno nativo detectado");
         console.log("[CromoSwap] Abriendo URL con Capacitor Browser");
         await Browser.open({ url });
         console.log("[CromoSwap] URL abierta correctamente");
       } else {
-        // Entorno web / navegador: fallback a window.open
         console.log("[CromoSwap] Entorno web detectado, usando window.open");
         window.open(url, "_blank");
       }
     } catch (err) {
       console.error("[CromoSwap] Error abriendo URL:", err);
-      // Fallback final: intentar window.open si Browser.open falla
       try {
         window.open(url, "_blank");
       } catch {
