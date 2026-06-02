@@ -1,4 +1,5 @@
 import { requireUser } from "@/lib/auth";
+import { normalizeActiveCityValue } from "@/lib/city-catalog";
 import { badRequest, forbidden, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 import { profileSchema } from "@/lib/validators";
@@ -44,9 +45,12 @@ export async function PATCH(request: Request) {
   try {
     const user = await requireUser();
     const data = profileSchema.parse(await request.json());
+    const city = await normalizeActiveCityValue(data.city);
+    if (!city) return json({ error: "Selecciona una ciudad activa del catalogo." }, { status: 400 });
+
     const updated = await prisma.user.update({
       where: { id: user.id },
-      data,
+      data: { ...data, city },
       select: { id: true, name: true, email: true, city: true, phone: true, role: true }
     });
     return json({ user: updated });

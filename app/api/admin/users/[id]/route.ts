@@ -1,14 +1,14 @@
 import bcrypt from "bcryptjs";
 import { requireAdmin } from "@/lib/auth";
 import { badRequest, json, notFound } from "@/lib/http";
-import { CITIES } from "@/lib/cities";
+import { normalizeActiveCityValue } from "@/lib/city-catalog";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const schema = z.object({
   isActive: z.boolean().optional(),
   role: z.enum(["USER", "ADMIN"]).optional(),
-  city: z.enum(CITIES).optional(),
+  city: z.string().trim().min(1).optional(),
   password: z.string().min(8).max(80).optional()
 });
 
@@ -17,6 +17,11 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     await requireAdmin();
     const data = schema.parse(await request.json());
     const { password, ...rest } = data;
+    const city = data.city ? await normalizeActiveCityValue(data.city) : undefined;
+    if (data.city && !city) {
+      return json({ error: "Selecciona una ciudad activa del catalogo." }, { status: 400 });
+    }
+
     if (Object.keys(rest).length === 0 && !password) {
       return json({ error: "No hay cambios para actualizar" }, { status: 400 });
     }
@@ -40,6 +45,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       where: { id: params.id },
       data: {
         ...rest,
+        ...(city ? { city } : {}),
         ...(password ? { passwordHash: await bcrypt.hash(password, 12) } : {})
       },
       select: { id: true, name: true, email: true, city: true, role: true, isActive: true }

@@ -29,10 +29,11 @@ export default async function AdminPage() {
         <StatCard label="Matches generados" value={matches} />
         <StatCard label="Reportes abiertos" value={reports} />
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-4">
         <Link className="btn-secondary" href="/admin/users">Usuarios</Link>
         <Link className="btn-secondary" href="/admin/reports">Reportes</Link>
         <Link className="btn-secondary" href="/admin/albums">Albumes</Link>
+        <Link className="btn-secondary" href="/admin/cities">Ciudades</Link>
       </div>
       <RestartSeasonForm />
     </section>

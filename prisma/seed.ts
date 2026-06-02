@@ -1,10 +1,49 @@
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
+import { INITIAL_CITIES, normalizeCityText, toCitySlug } from "../lib/city-catalog";
 
 const prisma = new PrismaClient();
 
 async function main() {
   await prisma.$transaction(async (tx) => {
+    for (const city of INITIAL_CITIES) {
+      await tx.city.upsert({
+        where: { slug: toCitySlug(city.name) },
+        update: {
+          name: city.name,
+          province: city.province,
+          isActive: true
+        },
+        create: {
+          name: city.name,
+          province: city.province,
+          slug: toCitySlug(city.name)
+        }
+      });
+    }
+
+    const existingUserCities = await tx.user.findMany({
+      distinct: ["city"],
+      where: { city: { not: "" } },
+      select: { city: true }
+    });
+
+    for (const entry of existingUserCities) {
+      const name = normalizeCityText(entry.city);
+      if (!name) continue;
+
+      await tx.city.upsert({
+        where: { slug: toCitySlug(name) },
+        update: {},
+        create: {
+          name,
+          province: "Sin definir",
+          slug: toCitySlug(name),
+          isActive: true
+        }
+      });
+    }
+
     const mundialSections = [
       ["HAI", "Haiti", 20],
       ["ECU", "Ecuador", 20],
@@ -26,7 +65,7 @@ async function main() {
       (await tx.album.create({
         data: {
           name: "Mundial 2026",
-          description: "Album comunitario inicial para intercambiar cromos del Mundial 2026 en Cuenca.",
+          description: "Album comunitario para intercambiar cromos del Mundial 2026 entre coleccionistas de Ecuador.",
           totalStickers,
           isActive: !activeAlbum,
           status: activeAlbum ? "DRAFT" : "ACTIVE"
@@ -67,7 +106,7 @@ async function main() {
       where: { email: adminEmail },
       update: { role: "ADMIN", isActive: true },
       create: {
-        name: "Admin CromoSwap",
+        name: "Admin CromoSwap Ecuador",
         email: adminEmail,
         passwordHash: await bcrypt.hash(adminPassword as string, 12),
         city: "Cuenca",

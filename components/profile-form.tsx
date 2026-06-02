@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { CITIES } from "@/lib/cities";
+import { CitySelect } from "@/components/city-select";
 
 export function ProfileForm({ user }: { user: { name: string; email: string; city: string; phone: string | null } }) {
   const [saved, setSaved] = useState(false);
@@ -35,14 +35,8 @@ export function ProfileForm({ user }: { user: { name: string; email: string; cit
         <input value={user.email} readOnly />
       </div>
       <div>
-        <label className="label">Ciudad</label>
-        <select name="city" defaultValue={user.city} required>
-          {CITIES.map((city) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
+        <label className="label">Ciudad *</label>
+        <CitySelect currentCity={user.city} />
       </div>
       <div>
         <label className="label">Celular</label>

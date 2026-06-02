@@ -1,14 +1,11 @@
 import { z } from "zod";
-import { CITIES, isValidCity, normalizeCity } from "@/lib/cities";
+import { normalizeCityText } from "@/lib/city-catalog";
 import { isValidPhone, normalizePhone } from "@/lib/phone";
 
 const citySchema = z
   .string()
-  .transform((value) => normalizeCity(value))
-  .refine((value) => value.length > 0, "La ciudad es obligatoria")
-  .refine((value) => isValidCity(value), {
-    message: `Ciudad invalida. Opciones permitidas: ${CITIES.join(", ")}`
-  });
+  .transform((value) => normalizeCityText(value))
+  .refine((value) => value.length > 0, "La ciudad es obligatoria");
 
 const phoneSchema = z
   .string()

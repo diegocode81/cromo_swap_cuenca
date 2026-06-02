@@ -249,7 +249,7 @@ export function InventoryManager({
         </head>
         <body>
           <div class="print-report">
-            <h1 class="print-title">CromoSwap Cuenca</h1>
+            <h1 class="print-title">CromoSwap Ecuador</h1>
             <h2 class="print-subtitle">${escapeHtml(title)}</h2>
             <div class="print-meta">Fecha: ${escapeHtml(printedAt)} | Usuario: ${escapeHtml(userName || "Usuario")}</div>
             <p class="print-list-title">Lista de cromos:</p>

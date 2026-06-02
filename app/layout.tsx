@@ -6,16 +6,26 @@ import { Providers } from "@/components/providers";
 import { SafetyBanner } from "@/components/safety-banner";
 
 export const metadata: Metadata = {
-  title: "CromoSwap Cuenca",
-  description: "Intercambia cromos con personas de tu ciudad de forma organizada y segura.",
+  title: "CromoSwap Ecuador",
+  description: "Intercambia cromos con coleccionistas de Ecuador de forma organizada y segura.",
   manifest: "/manifest.webmanifest",
+  openGraph: {
+    title: "CromoSwap Ecuador",
+    description: "Intercambia cromos con coleccionistas de Ecuador de forma organizada y segura.",
+    type: "website"
+  },
+  twitter: {
+    card: "summary",
+    title: "CromoSwap Ecuador",
+    description: "Intercambia cromos con coleccionistas de Ecuador de forma organizada y segura."
+  },
   icons: {
     icon: "/icon.svg",
     apple: "/icon.svg"
   },
   appleWebApp: {
     capable: true,
-    title: "CromoSwap",
+    title: "CromoSwap Ecuador",
     statusBarStyle: "default"
   }
 };

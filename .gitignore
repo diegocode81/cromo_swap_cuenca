@@ -17,4 +17,4 @@ android/release-signing.properties
 
 # Artefactos Android — generados por npm run android:apk / android:bundle
 # NO deben entrar al repositorio. Generarlos localmente antes de distribuir.
-public/downloads/cromoswap-cuenca.apk
+public/downloads/cromoswap-ecuador.apk

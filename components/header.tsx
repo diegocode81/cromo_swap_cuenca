@@ -22,7 +22,7 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-4 sm:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link href={isAuthenticated ? "/dashboard" : "/"} className="text-lg font-black text-field">
-            CromoSwap Cuenca
+            CromoSwap Ecuador
           </Link>
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
             {isAuthenticated ? (

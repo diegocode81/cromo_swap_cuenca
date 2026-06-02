@@ -10,7 +10,7 @@
  * Hace:
  *   ✅ Capacitor sync
  *   ✅ ./gradlew assembleRelease  → APK firmado
- *   ✅ Copia APK a public/downloads/cromoswap-cuenca.apk (distribución local)
+ *   ✅ Copia APK a public/downloads/cromoswap-ecuador.apk (distribución local)
  *
  * NO hace:
  *   ❌ Incremento de versión
@@ -24,7 +24,7 @@ import { join } from "node:path";
 const root = process.cwd();
 const versionPath = join(root, "public/downloads/android-version.json");
 const releaseApkSrc = join(root, "android/app/build/outputs/apk/release/app-release.apk");
-const releaseApkDst = join(root, "public/downloads/cromoswap-cuenca.apk");
+const releaseApkDst = join(root, "public/downloads/cromoswap-ecuador.apk");
 const signingPath = join(root, "android/release-signing.properties");
 
 function run(command, args, options = {}) {

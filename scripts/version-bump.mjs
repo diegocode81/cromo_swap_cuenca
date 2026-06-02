@@ -126,7 +126,7 @@ const nextVersionCode = Number(version.versionCode) + 1;
 
 version.versionName = nextVersionName;
 version.versionCode = nextVersionCode;
-version.apkUrl = "/downloads/cromoswap-cuenca.apk";
+version.apkUrl = "/downloads/cromoswap-ecuador.apk";
 version.required =
   process.env.ANDROID_UPDATE_REQUIRED === "true" ? true : Boolean(version.required);
 version.notes = `Actualizacion ${nextVersionName} (${bump}).`;

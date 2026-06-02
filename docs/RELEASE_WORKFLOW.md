@@ -1,4 +1,4 @@
-# CromoSwap — Workflow de Release
+# CromoSwap Ecuador — Workflow de Release
 
 Guía del flujo de trabajo diario y de generación de artefactos Android.
 
@@ -93,12 +93,12 @@ npm run android:apk
 **Resultado:**
 ```
 [android:apk] ✅ APK listo: 3.6.0 (16)
-[android:apk]    Ruta: public/downloads/cromoswap-cuenca.apk
+[android:apk]    Ruta: public/downloads/cromoswap-ecuador.apk
 ```
 
-El APK queda en `public/downloads/cromoswap-cuenca.apk` (no se sube a git).
+El APK queda en `public/downloads/cromoswap-ecuador.apk` (no se sube a git).
 
-> ⚠️ **Nota:** `public/downloads/cromoswap-cuenca.apk` está en `.gitignore`.
+> ⚠️ **Nota:** `public/downloads/cromoswap-ecuador.apk` está en `.gitignore`.
 > El APK debe distribuirse manualmente (email, WhatsApp, servidor propio, etc.).
 
 ---
@@ -203,7 +203,7 @@ SKIP_ANDROID_RELEASE=1 git commit -m "commit sin bump de versión"
 | `scripts/prepare-android-bundle.mjs` | Build AAB para Google Play | ✅ Sí |
 | `public/downloads/android-version.json` | Versión actual publicada | ✅ Sí |
 | `android/app/build.gradle` | Versión nativa Android | ✅ Sí |
-| `public/downloads/cromoswap-cuenca.apk` | APK generado | ❌ .gitignore |
+| `public/downloads/cromoswap-ecuador.apk` | APK generado | ❌ .gitignore |
 | `android/app/build/outputs/bundle/release/app-release.aab` | AAB generado | ❌ .gitignore |
 | `android/release-signing.properties` | Credenciales de firma | ❌ .gitignore |
 | `android/keystores/cromoswap-release.jks` | Keystore | ❌ .gitignore |

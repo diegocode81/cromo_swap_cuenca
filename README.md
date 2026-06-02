@@ -1,6 +1,6 @@
-# CromoSwap Cuenca
+# CromoSwap Ecuador
 
-Plataforma comunitaria gratuita para intercambiar cromos por ciudad. La primera temporada usa el album Mundial 2026, pero la arquitectura es multi-album y permite reiniciar temporadas sin borrar usuarios, inventarios ni matches historicos.
+Plataforma comunitaria gratuita para intercambiar cromos entre coleccionistas de Ecuador, organizada por ciudad. La primera temporada usa el album Mundial 2026, pero la arquitectura es multi-ciudad y multi-album, y permite reiniciar temporadas sin borrar usuarios, inventarios ni matches historicos.
 
 ## Stack
 
@@ -47,9 +47,18 @@ El seed crea:
 
 - Album `Mundial 2026`; lo deja activo solo si no existe otro album activo
 - Catalogo inicial parametrizado por secciones/equipos
+- Catalogo inicial de ciudades/cantones de Ecuador
 - Usuario admin usando `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD`
 
 `SEED_ADMIN_PASSWORD` es obligatorio solo cuando el admin inicial no existe. No uses una contrasena publica ni reutilizada.
+
+## Gestion de ciudades
+
+El campo ciudad se selecciona desde un catalogo persistente en la tabla `cities`. El administrador puede crear, editar, activar/desactivar y eliminar ciudades desde `/admin/cities`.
+
+`User.city` se mantiene como texto normalizado para conservar compatibilidad con usuarios existentes y con el algoritmo de matching. Las ciudades inactivas dejan de aparecer como opcion nueva en registro/perfil, pero no rompen usuarios existentes.
+
+Antes de aplicar migraciones en produccion, verifica un backup actualizado. Ver `docs/CITY_CATALOG.md`.
 
 ## Gestion de albumes
 
@@ -123,7 +132,7 @@ Resultado:
 Salida esperada:
 
 ```text
-public/downloads/cromoswap-cuenca.apk
+public/downloads/cromoswap-ecuador.apk
 ```
 
 ### Generar Android App Bundle
@@ -169,12 +178,12 @@ SKIP_ANDROID_RELEASE=1 git commit -m "mensaje"
 
 | Artefacto | Comando | Salida | Uso | En git |
 |---|---|---|---|---|
-| APK release | `npm run android:apk` | `public/downloads/cromoswap-cuenca.apk` | Distribucion manual | No |
+| APK release | `npm run android:apk` | `public/downloads/cromoswap-ecuador.apk` | Distribucion manual | No |
 | AAB release | `npm run android:bundle` | `android/app/build/outputs/bundle/release/app-release.aab` | Google Play Console | No |
 
 No deben subirse al repositorio:
 
-- `public/downloads/cromoswap-cuenca.apk`
+- `public/downloads/cromoswap-ecuador.apk`
 - `android/app/build/`
 - `android/app/build/outputs/bundle/release/app-release.aab`
 - `android/release-signing.properties`

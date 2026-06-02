@@ -32,12 +32,12 @@ export async function sendPasswordResetEmail({ to, name, resetUrl }: { to: strin
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      from: "CromoSwap Cuenca <onboarding@resend.dev>",
+      from: "CromoSwap Ecuador <onboarding@resend.dev>",
       to,
-      subject: "Recupera tu contrasena de CromoSwap Cuenca",
+      subject: "Recupera tu contrasena de CromoSwap Ecuador",
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.5;color:#19302b">
-          <h1 style="font-size:22px;margin:0 0 12px">CromoSwap Cuenca</h1>
+          <h1 style="font-size:22px;margin:0 0 12px">CromoSwap Ecuador</h1>
           <p>Hola ${escapeEmailHtml(name || "Usuario")},</p>
           <p>Recibimos una solicitud para cambiar tu contrasena. Este enlace expira en 1 hora y solo puede usarse una vez.</p>
           <p>

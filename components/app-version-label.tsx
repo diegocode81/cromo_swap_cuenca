@@ -39,7 +39,7 @@ export function AppVersionLabel() {
 
   return (
     <footer className="mx-auto w-full max-w-6xl px-4 pb-5 text-center text-[11px] font-semibold text-slate-400 sm:px-6">
-      CromoSwap {isNativeApp ? "Android" : "Web"} v{version.versionName}
+      CromoSwap Ecuador {isNativeApp ? "Android" : "Web"} v{version.versionName}
     </footer>
   );
 }

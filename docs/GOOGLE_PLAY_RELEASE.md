@@ -1,4 +1,4 @@
-# CromoSwap Cuenca — Publicación en Google Play
+# CromoSwap Ecuador — Publicación en Google Play
 
 Guía completa para generar el Android App Bundle (`.aab`) y publicar en Google Play Console.
 
@@ -9,7 +9,7 @@ Guía completa para generar el Android App Bundle (`.aab`) y publicar en Google 
 | Campo | Valor |
 |---|---|
 | **Application ID** | `com.codeconsultings.cromoswapcuenca` |
-| **App Name** | CromoSwap Cuenca |
+| **App Name** | CromoSwap Ecuador |
 | **Version Name** | `3.4.0` |
 | **Version Code** | `12` |
 | **Min SDK** | 24 (Android 7.0) |
@@ -146,7 +146,7 @@ echo "✅ AAB generado en: android/app/build/outputs/bundle/release/app-release.
 ### Pasos:
 
 1. Ir a [Google Play Console](https://play.google.com/console)
-2. Seleccionar la app **CromoSwap Cuenca** (o crearla si no existe)
+2. Seleccionar la app **CromoSwap Ecuador** (o crearla si no existe)
 3. En el menú lateral: **Producción → Versiones de la app → Crear nueva versión**
 4. En **Android App Bundles**, subir:
    ```

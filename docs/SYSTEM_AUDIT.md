@@ -8,7 +8,7 @@ Rol de auditoria: Software Architect, Tech Lead, QA Architect
 
 ## Resumen ejecutivo
 
-Cromo Swap es una aplicacion web comunitaria para intercambio de cromos en Cuenca, Ecuador. El sistema actual implementa registro/login, recuperacion de contrasena, gestion de inventario por album activo, generacion de matches mediante un agente batch, chat persistido por polling, reportes de seguridad y administracion de usuarios/albumes/reportes.
+Cromo Swap es una aplicacion web comunitaria para intercambio de cromos entre coleccionistas de Ecuador, organizada por ciudad. El sistema actual implementa registro/login, recuperacion de contrasena, gestion de inventario por album activo, generacion de matches mediante un agente batch, chat persistido por polling, reportes de seguridad y administracion de usuarios/albumes/reportes.
 
 El proyecto compila y pasa lint/test en el entorno actual:
 
@@ -92,7 +92,7 @@ flowchart TD
 
 ### Flujo principal de negocio
 
-1. Usuario se registra en Cuenca (`/register`, `/api/auth/register`).
+1. Usuario se registra y elige su ciudad (`/register`, `/api/auth/register`).
 2. Usuario inicia sesion con email/contrasena (`NextAuth credentials`).
 3. Admin crea o activa un album con catalogo de cromos por secciones.
 4. Usuario marca cromos que tiene y repetidos en el album activo (`/album`, `/repeated`, `/missing`).
@@ -624,7 +624,7 @@ No se encontro directorio `.github` ni pipeline CI en el repositorio. La validac
 
 ### Que hace exactamente hoy
 
-Permite a usuarios de Cuenca registrarse, iniciar sesion, registrar cromos del album activo, marcar repetidos, ver matches generados por un agente, iniciar chats, enviar mensajes y reportar problemas. Admin puede crear/activar/editar/eliminar albumes, ejecutar el agente, gestionar usuarios, cambiar contrasenas y revisar reportes.
+Permite a usuarios de diferentes ciudades de Ecuador registrarse, iniciar sesion, registrar cromos del album activo, marcar repetidos, ver matches generados por un agente, iniciar chats, enviar mensajes y reportar problemas. Admin puede crear/activar/editar/eliminar albumes, ejecutar el agente, gestionar usuarios, cambiar contrasenas y revisar reportes.
 
 ### Que partes estan completas
 

@@ -67,7 +67,7 @@ El mensaje generado incluye:
 Ejemplo:
 
 ```text
-Hola, vi en CromoSwap que podemos intercambiar cromos. Yo puedo entregarte ALG 1 y me interesaria recibir ALG 4.
+Hola, vi en CromoSwap Ecuador que podemos intercambiar cromos. Yo puedo entregarte ALG 1 y me interesaria recibir ALG 4.
 ```
 
 ## Matches
@@ -77,7 +77,7 @@ Hola, vi en CromoSwap que podemos intercambiar cromos. Yo puedo entregarte ALG 1
 ```json
 {
   "userId": "id",
-  "userName": "Admin CromoSwap",
+  "userName": "Admin CromoSwap Ecuador",
   "city": "Cuenca",
   "phone": "+593987654321",
   "exchangeQuantity": 1,

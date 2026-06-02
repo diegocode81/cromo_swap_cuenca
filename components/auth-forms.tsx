@@ -4,8 +4,8 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { CitySelect } from "@/components/city-select";
 import { PasswordInput } from "@/components/password-input";
-import { CITIES } from "@/lib/cities";
 
 export function LoginForm() {
   const router = useRouter();
@@ -188,17 +188,8 @@ export function RegisterForm() {
         <PasswordInput name="password" required minLength={8} />
       </div>
       <div>
-        <label className="label">Ciudad</label>
-        <select name="city" required defaultValue="">
-          <option value="" disabled>
-            Selecciona tu ciudad
-          </option>
-          {CITIES.map((city) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
-        </select>
+        <label className="label">Ciudad *</label>
+        <CitySelect />
       </div>
       <div>
         <label className="label">Celular</label>

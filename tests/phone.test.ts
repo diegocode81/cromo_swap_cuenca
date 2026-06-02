@@ -52,7 +52,7 @@ describe("WhatsApp links", () => {
   it("builds a WhatsApp message with stickers given and received", () => {
     const message = buildWhatsAppMessage({ youGive, youReceive });
 
-    expect(message).toContain("CromoSwap");
+    expect(message).toContain("CromoSwap Ecuador");
     expect(message).toContain("ALG 1");
     expect(message).toContain("ALG 4");
   });

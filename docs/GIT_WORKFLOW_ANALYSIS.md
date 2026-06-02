@@ -1,4 +1,4 @@
-# CromoSwap — Análisis del Workflow de Git / Build Android Automático
+# CromoSwap Ecuador — Análisis del Workflow de Git / Build Android Automático
 
 **Fecha de análisis:** Enero 2026  
 **Estado:** Solo diagnóstico — sin cambios aplicados
@@ -90,8 +90,8 @@ node scripts/prepare-android-release.mjs
     ├── 7. Actualiza public/downloads/android-version.json
     ├── 8. npx cap sync android            (sincroniza Capacitor)
     ├── 9. ./gradlew assembleRelease       (compila APK release firmado)
-    ├── 10. Copia APK → public/downloads/cromoswap-cuenca.apk
-    └── 11. git add build.gradle + android-version.json + cromoswap-cuenca.apk
+    ├── 10. Copia APK → public/downloads/cromoswap-ecuador.apk
+    └── 11. git add build.gradle + android-version.json + cromoswap-ecuador.apk
     │
     ▼
 Git continúa con el commit (incluyendo los archivos añadidos en paso 11)
@@ -112,7 +112,7 @@ Commit finalizado con versión bumpeada y APK actualizado
 | `public/downloads/android-version.json` | Fuente de verdad de versión del APK |
 | `android/app/build.gradle` | Actualizado con nueva versión en cada commit |
 | `android/app/build/outputs/apk/release/app-release.apk` | APK compilado |
-| `public/downloads/cromoswap-cuenca.apk` | APK publicado (accesible vía web) |
+| `public/downloads/cromoswap-ecuador.apk` | APK publicado (accesible vía web) |
 | `android/release-signing.properties` | Credenciales de firma (local, no en git) |
 | `android/keystores/cromoswap-release.jks` | Keystore de firma (local, no en git) |
 
@@ -142,7 +142,7 @@ El script ejecuta `./gradlew assembleRelease` (APK). Para **Google Play** se req
 El script hace `git add` en medio del proceso de commit (paso 11 del grafo). Esto es técnicamente válido en pre-commit, pero hace que cada commit incluya automáticamente cambios de `build.gradle`, `android-version.json` y el APK binario (~30 MB). **El repositorio crece con cada commit.**
 
 ### 4. **APK binario en git**
-`public/downloads/cromoswap-cuenca.apk` se sube al repositorio en cada commit. Los binarios grandes en git no son eliminables sin reescritura de historia (`git filter-branch` / `git-filter-repo`).
+`public/downloads/cromoswap-ecuador.apk` se sube al repositorio en cada commit. Los binarios grandes en git no son eliminables sin reescritura de historia (`git filter-branch` / `git-filter-repo`).
 
 ### 5. **Falla bloquea el commit**
 Si Gradle falla (sin Android SDK, sin keystore, sin conexión para descargar dependencias), el commit **no se puede completar**. Cualquier colaborador sin el entorno Android configurado no puede hacer commits.
@@ -203,7 +203,7 @@ El proyecto está **migrando a Google Play**. La distribución directa de APK ya
    npm run android:release-apk
    ```
 
-3. **Excluir el APK binario del repositorio** (`public/downloads/cromoswap-cuenca.apk`) añadiéndolo a `.gitignore`. En Google Play, el APK no necesita estar en el repo.
+3. **Excluir el APK binario del repositorio** (`public/downloads/cromoswap-ecuador.apk`) añadiéndolo a `.gitignore`. En Google Play, el APK no necesita estar en el repo.
 
 4. **Documentar** que `core.hooksPath = .githooks` debe configurarse manualmente por cada colaborador:
    ```bash

@@ -39,7 +39,7 @@ export function buildWhatsAppMessage({
 }) {
   const giveText = youGive.map(stickerLabel).join(", ");
   const receiveText = youReceive.map(stickerLabel).join(", ");
-  return `Hola, vi en CromoSwap que podemos intercambiar cromos. Yo puedo entregarte ${giveText} y me interesaria recibir ${receiveText}.`;
+  return `Hola, vi en CromoSwap Ecuador que podemos intercambiar cromos. Yo puedo entregarte ${giveText} y me interesaria recibir ${receiveText}.`;
 }
 
 export function buildWhatsAppUrl({

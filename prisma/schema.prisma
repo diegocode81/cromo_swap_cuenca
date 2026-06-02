@@ -60,6 +60,20 @@ model User {
   @@index([city])
 }
 
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  province  String
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, province])
+  @@index([isActive, name])
+  @@map("cities")
+}
+
 model PasswordResetToken {
   id        String    @id @default(cuid())
   userId    String

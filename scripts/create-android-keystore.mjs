@@ -32,7 +32,7 @@ execFileSync(
     "-keypass",
     password,
     "-dname",
-    "CN=CromoSwap Cuenca, OU=CodeConsultings, O=CodeConsultings, L=Cuenca, ST=Azuay, C=EC"
+    "CN=CromoSwap Ecuador, OU=CodeConsultings, O=CodeConsultings, L=Cuenca, ST=Azuay, C=EC"
   ],
   { stdio: "inherit" }
 );

@@ -1,11 +1,15 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { badRequest, json } from "@/lib/http";
+import { normalizeActiveCityValue } from "@/lib/city-catalog";
 import { registerSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
   try {
     const data = registerSchema.parse(await request.json());
+    const city = await normalizeActiveCityValue(data.city);
+    if (!city) return json({ error: "Selecciona una ciudad activa del catalogo." }, { status: 400 });
+
     const exists = await prisma.user.findUnique({ where: { email: data.email } });
     if (exists) return json({ error: "Ese email ya esta registrado" }, { status: 409 });
 
@@ -14,7 +18,7 @@ export async function POST(request: Request) {
         name: data.name,
         email: data.email,
         passwordHash: await bcrypt.hash(data.password, 12),
-        city: data.city,
+        city,
         phone: data.phone
       },
       select: { id: true, name: true, email: true, city: true, phone: true }
