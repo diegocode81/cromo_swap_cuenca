@@ -1,8 +1,20 @@
 #!/bin/sh
+# .githooks/pre-commit
+#
+# Hook ligero de pre-commit.
+# Solo incrementa la versión (android-version.json + build.gradle).
+# NO genera APK ni AAB. NO ejecuta Gradle.
+#
+# Para omitir el versionado en un commit puntual:
+#   SKIP_ANDROID_RELEASE=1 git commit -m "mensaje"
+#
+# Para generar APK:   npm run android:apk
+# Para generar AAB:   npm run android:bundle
+
 set -e
 
 if [ "$SKIP_ANDROID_RELEASE" = "1" ]; then
   exit 0
 fi
 
-npm run android:release-apk
+node scripts/version-bump.mjs
