@@ -120,7 +120,7 @@ export default async function DashboardPage() {
                     {teamProgress.completedTeams.map((team) => (
                       <li key={`${team.code}-${team.name}`} className="flex items-center justify-between gap-3 rounded-lg border border-emerald-100 bg-white px-3 py-2">
                         <span className="min-w-0 truncate text-sm font-bold text-ink">
-                          <span className="mr-2">{team.flag ?? "🏁"}</span>
+                          <span className="mr-2">{team.flag}</span>
                           {team.name}
                         </span>
                         <span className="rounded-full bg-field px-2 py-0.5 text-[10px] font-black uppercase text-white">

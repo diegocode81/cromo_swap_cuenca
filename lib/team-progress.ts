@@ -1,3 +1,5 @@
+import { getTeamFlag } from "@/lib/team-flags";
+
 export type TeamStickerGroup = {
   code: string;
   section: string;
@@ -12,23 +14,11 @@ export type OwnedTeamSticker = {
 export type TeamProgress = {
   code: string;
   name: string;
-  flag: string | null;
+  flag: string;
   totalStickers: number;
   ownedStickers: number;
   isStarted: boolean;
   isCompleted: boolean;
-};
-
-const COUNTRY_FLAGS: Record<string, string> = {
-  ARG: "🇦🇷",
-  BRA: "🇧🇷",
-  CAN: "🇨🇦",
-  ECU: "🇪🇨",
-  ESP: "🇪🇸",
-  FRA: "🇫🇷",
-  HAI: "🇭🇹",
-  MEX: "🇲🇽",
-  USA: "🇺🇸"
 };
 
 function teamKey(code: string, section: string) {
@@ -60,7 +50,7 @@ export function buildTeamProgress({
       return {
         code: team.code,
         name: team.section,
-        flag: COUNTRY_FLAGS[team.code.toUpperCase()] ?? null,
+        flag: getTeamFlag(team.section, team.code),
         totalStickers: team.totalStickers,
         ownedStickers,
         isStarted: ownedStickers > 0,

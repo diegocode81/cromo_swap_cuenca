@@ -85,6 +85,103 @@ Incluye una prueba basica del `ExchangeAgent`. Para ampliar cobertura, agrega fi
 npm run build
 ```
 
+## Release Workflow
+
+El flujo diario separa el versionado automatico de la generacion de artefactos Android.
+
+### Desarrollo diario
+
+```bash
+git add .
+git commit -m "mensaje"
+git push
+```
+
+Resultado:
+
+- El commit incrementa automaticamente la version Android.
+- `public/downloads/android-version.json` se actualiza y sigue siendo la fuente de verdad.
+- `android/app/build.gradle` queda sincronizado con la version generada.
+- El push despliega automaticamente la web en Vercel.
+- No se generan APKs.
+- No se generan AABs.
+- No se agregan binarios Android al repositorio.
+
+### Generar APK
+
+```bash
+npm run android:apk
+```
+
+Resultado:
+
+- Genera un APK release firmado.
+- Usa la version ya generada por los commits previos.
+- Se usa para distribucion manual fuera de Google Play.
+- No incrementa la version y no hace `git add`.
+
+Salida esperada:
+
+```text
+public/downloads/cromoswap-cuenca.apk
+```
+
+### Generar Android App Bundle
+
+```bash
+npm run android:bundle
+```
+
+Resultado:
+
+- Genera el Android App Bundle release firmado.
+- Usa la version ya generada por los commits previos.
+- Produce el artefacto listo para subir a Google Play Console.
+- No incrementa la version y no hace `git add`.
+
+Ruta esperada:
+
+```text
+android/app/build/outputs/bundle/release/app-release.aab
+```
+
+### Google Play
+
+Google Play sera el mecanismo principal de distribucion de la app Android. Para produccion, el modal de actualizacion manual de APK esta desactivado por defecto mediante `NEXT_PUBLIC_ENABLE_APK_UPDATE_CHECK=false` o dejando la variable sin definir.
+
+Google Play gestionara las actualizaciones de usuarios. El modal de APK solo debe activarse con `NEXT_PUBLIC_ENABLE_APK_UPDATE_CHECK=true` para distribucion manual fuera de Google Play.
+
+## Versioning
+
+- Cada commit incrementa automaticamente la version Android mediante `.githooks/pre-commit`.
+- `public/downloads/android-version.json` es la fuente de verdad de la version.
+- `android/app/build.gradle` se mantiene sincronizado con `android-version.json`.
+- La web desplegada en Vercel y la app Android usan la misma version publicada.
+- Los releases Android no generan una version nueva: `npm run android:apk` y `npm run android:bundle` usan la version ya creada por los commits.
+
+Para omitir el versionado en un commit puntual:
+
+```bash
+SKIP_ANDROID_RELEASE=1 git commit -m "mensaje"
+```
+
+## Artefactos Android
+
+| Artefacto | Comando | Salida | Uso | En git |
+|---|---|---|---|---|
+| APK release | `npm run android:apk` | `public/downloads/cromoswap-cuenca.apk` | Distribucion manual | No |
+| AAB release | `npm run android:bundle` | `android/app/build/outputs/bundle/release/app-release.aab` | Google Play Console | No |
+
+No deben subirse al repositorio:
+
+- `public/downloads/cromoswap-cuenca.apk`
+- `android/app/build/`
+- `android/app/build/outputs/bundle/release/app-release.aab`
+- `android/release-signing.properties`
+- `android/keystores/`
+
+La configuracion de `.gitignore` excluye los artefactos generados y las credenciales de firma Android.
+
 ## Deploy en Vercel
 
 1. Crea una base PostgreSQL en Neon.
@@ -117,6 +214,11 @@ npm run build
 ```bash
 npm run dev
 npm run build
+npm run android:apk
+npm run android:bundle
+npm run android:apk-debug
+npm run android:sync
+npm run android:create-keystore
 npm run prisma:migrate
 npm run prisma:seed
 npm run test
