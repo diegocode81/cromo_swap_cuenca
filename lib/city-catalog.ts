@@ -63,21 +63,35 @@ export function cityResponse(city: CityOption) {
   };
 }
 
+export function isCityCatalogUnavailableError(error: unknown) {
+  const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+  const message = error instanceof Error ? error.message : String(error);
+
+  return (
+    code === "P2021" ||
+    /table .*cities.* does not exist|relation .*cities.* does not exist|does not exist in the current database/i.test(message)
+  );
+}
+
 export async function findActiveCityByValue(value: string) {
   const normalized = normalizeCityText(value);
   const slug = toCitySlug(normalized);
 
-  return prisma.city.findFirst({
-    where: {
-      isActive: true,
-      OR: [{ slug }, { name: { equals: normalized, mode: "insensitive" } }]
-    },
-    select: { id: true, name: true, province: true, slug: true }
-  });
+  return prisma.city
+    .findFirst({
+      where: {
+        isActive: true,
+        OR: [{ slug }, { name: { equals: normalized, mode: "insensitive" } }]
+      },
+      select: { id: true, name: true, province: true, slug: true }
+    })
+    .catch((error) => {
+      if (isCityCatalogUnavailableError(error)) return null;
+      throw error;
+    });
 }
 
 export async function normalizeActiveCityValue(value: string) {
   const city = await findActiveCityByValue(value);
   return city?.name ?? null;
 }
-

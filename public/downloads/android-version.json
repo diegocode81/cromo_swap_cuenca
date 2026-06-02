@@ -1,7 +1,7 @@
 {
-  "versionName": "4.0.0",
-  "versionCode": 16,
+  "versionName": "4.1.0",
+  "versionCode": 17,
   "apkUrl": "/downloads/cromoswap-ecuador.apk",
   "required": false,
-  "notes": "Actualizacion 4.0.0 (major)."
+  "notes": "Actualizacion 4.1.0 (minor)."
 }

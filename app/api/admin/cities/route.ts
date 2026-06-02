@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth";
-import { cityInputSchema, cityResponse, toCitySlug } from "@/lib/city-catalog";
+import { cityInputSchema, cityResponse, isCityCatalogUnavailableError, toCitySlug } from "@/lib/city-catalog";
 import { badRequest, forbidden, json } from "@/lib/http";
 import { prisma } from "@/lib/prisma";
 
@@ -15,7 +15,10 @@ export async function GET() {
 
     return json(cities);
   } catch (error) {
-    if (error instanceof Error && error.message === "FORBIDDEN") return forbidden();
+    if (error instanceof Error && ["FORBIDDEN", "UNAUTHORIZED"].includes(error.message)) return forbidden();
+    if (isCityCatalogUnavailableError(error)) {
+      return json({ error: "El catalogo de ciudades no esta disponible. Aplica la migracion de ciudades." }, { status: 503 });
+    }
     return badRequest(error);
   }
 }
@@ -54,7 +57,10 @@ export async function POST(request: Request) {
 
     return json({ city: cityResponse(city) }, { status: 201 });
   } catch (error) {
-    if (error instanceof Error && error.message === "FORBIDDEN") return forbidden();
+    if (error instanceof Error && ["FORBIDDEN", "UNAUTHORIZED"].includes(error.message)) return forbidden();
+    if (isCityCatalogUnavailableError(error)) {
+      return json({ error: "El catalogo de ciudades no esta disponible. Aplica la migracion de ciudades." }, { status: 503 });
+    }
     return badRequest(error);
   }
 }

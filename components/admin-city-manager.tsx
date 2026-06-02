@@ -11,10 +11,10 @@ type AdminCity = {
   isActive: boolean;
 };
 
-export function AdminCityManager({ cities }: { cities: AdminCity[] }) {
+export function AdminCityManager({ cities, initialError = "" }: { cities: AdminCity[]; initialError?: string }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(initialError);
 
   const visibleCities = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -67,7 +67,11 @@ export function AdminCityManager({ cities }: { cities: AdminCity[] }) {
           Activa
         </label>
         <button className="btn-primary" type="submit">Crear ciudad</button>
-        {message ? <p className="text-sm font-semibold text-field md:col-span-4">{message}</p> : null}
+        {message ? (
+          <p className={`text-sm font-semibold md:col-span-4 ${initialError ? "text-red-600" : "text-field"}`}>
+            {message}
+          </p>
+        ) : null}
       </form>
 
       <div className="card">
@@ -80,7 +84,9 @@ export function AdminCityManager({ cities }: { cities: AdminCity[] }) {
           <AdminCityCard key={city.id} city={city} />
         ))}
         {visibleCities.length === 0 ? (
-          <div className="card text-sm font-semibold text-slate-600">No hay ciudades con ese filtro.</div>
+          <div className="card text-sm font-semibold text-slate-600">
+            {query.trim() ? "No hay ciudades con ese filtro." : "No hay ciudades registradas todavia."}
+          </div>
         ) : null}
       </div>
     </div>
@@ -178,4 +184,3 @@ function AdminCityCard({ city }: { city: AdminCity }) {
     </article>
   );
 }
-
