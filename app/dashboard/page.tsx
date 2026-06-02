@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { StatCard } from "@/components/stat-card";
 import { buildTeamProgress } from "@/lib/team-progress";
 
 export default async function DashboardPage() {
@@ -75,6 +74,16 @@ export default async function DashboardPage() {
                 {registered} de {activeAlbum?.totalStickers ?? 0} cromos registrados en este album.
               </p>
             </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <DashboardMetric label="Cromos registrados" value={registered} />
+              <DashboardMetric label="Repetidos" value={repeated} />
+              <DashboardMetric label="Faltantes" value={missing} />
+              <DashboardMetric label="Matches" value={matches} />
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Link className="btn-primary text-center" href="/album">Registrar cromos</Link>
+              <Link className="btn-secondary text-center" href="/matches">Ver matches</Link>
+            </div>
           </div>
           <div className="border-t border-emerald-100 bg-[linear-gradient(135deg,#eaf6ff,#f3fbf4)] p-5 md:border-l md:border-t-0">
             <div className="rounded-lg border border-white/80 bg-white/90 p-4 shadow-sm">
@@ -130,16 +139,15 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Cromos registrados" value={registered} />
-        <StatCard label="Repetidos" value={repeated} />
-        <StatCard label="Faltantes" value={missing} />
-        <StatCard label="Matches" value={matches} />
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Link className="btn-primary" href="/album">Registrar cromos</Link>
-        <Link className="btn-secondary" href="/matches">Ver matches</Link>
-      </div>
     </section>
+  );
+}
+
+function DashboardMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-3">
+      <p className="text-xs font-bold text-slate-600">{label}</p>
+      <p className="mt-1 text-2xl font-black text-field">{value}</p>
+    </div>
   );
 }
