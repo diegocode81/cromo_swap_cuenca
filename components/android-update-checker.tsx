@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
+import { Browser } from "@capacitor/browser";
 
 type AndroidVersion = {
   versionName: string;
@@ -15,70 +17,28 @@ type CapacitorAppInfo = {
   build?: string;
 };
 
-declare global {
-  interface Window {
-    Capacitor?: {
-      isNativePlatform?: () => boolean;
-    };
-  }
-}
-
 function resolveApkUrl(apkUrl: string): string {
   if (!apkUrl) return "";
   if (apkUrl.startsWith("http")) return apkUrl;
-  return `${window.location.origin}${apkUrl}`;
-}
-
-/**
- * Abre una URL externamente.
- * En Capacitor/Android, window.open(url, "_system") fuerza el navegador del
- * sistema operativo (fuera del WebView), lo cual permite descargar el APK.
- * Si falla, intenta con "_blank" y luego con window.location.href.
- * Devuelve true si se pudo abrir, false si todos los intentos fallaron.
- */
-function openExternalUrl(url: string): boolean {
-  try {
-    // _system: Capacitor/Cordova estándar para abrir en navegador externo (Android & iOS)
-    const ref = window.open(url, "_system");
-    if (ref) {
-      console.log("[CromoSwap] APK abierto con _system:", url);
-      return true;
-    }
-  } catch (e) {
-    console.warn("[CromoSwap] window.open(_system) falló:", e);
-  }
-
-  try {
-    const ref = window.open(url, "_blank");
-    if (ref) {
-      console.log("[CromoSwap] APK abierto con _blank:", url);
-      return true;
-    }
-  } catch (e) {
-    console.warn("[CromoSwap] window.open(_blank) falló:", e);
-  }
-
-  try {
-    window.location.href = url;
-    console.log("[CromoSwap] APK abierto con location.href:", url);
-    return true;
-  } catch (e) {
-    console.error("[CromoSwap] location.href también falló:", e);
-  }
-
-  return false;
+  // El servidor remoto de Capacitor es https://cromoswapcuenca.vercel.app
+  const origin =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://cromoswapcuenca.vercel.app";
+  return `${origin}${apkUrl}`;
 }
 
 export function AndroidUpdateChecker() {
   const [latestVersion, setLatestVersion] = useState<AndroidVersion | null>(null);
   const [currentVersion, setCurrentVersion] = useState<CapacitorAppInfo | null>(null);
   const [downloadError, setDownloadError] = useState(false);
+  const [isOpening, setIsOpening] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
     async function checkVersion() {
-      if (!window.Capacitor?.isNativePlatform?.()) return;
+      if (!Capacitor.isNativePlatform()) return;
 
       const [{ App }, response] = await Promise.all([
         import("@capacitor/app"),
@@ -108,28 +68,46 @@ export function AndroidUpdateChecker() {
 
   if (!latestVersion) return null;
 
-  function handleUpdatePress() {
-    if (!latestVersion) return;
+  async function handleUpdatePress() {
+    if (!latestVersion || isOpening) return;
 
     const url = resolveApkUrl(latestVersion.apkUrl);
 
-    // Validación: URL no vacía
-    if (!url) {
-      console.error("[CromoSwap] URL de descarga del APK está vacía o inválida.");
+    console.log("[CromoSwap] Actualizar APK presionado");
+
+    // Validar URL
+    if (!url || (!url.startsWith("http://") && !url.startsWith("https://"))) {
+      console.error("[CromoSwap] URL de descarga inválida o vacía:", url);
       setDownloadError(true);
       return;
     }
 
-    console.log("[CromoSwap] Botón 'Actualizar APK' presionado.");
-    console.log("[CromoSwap] URL de descarga resuelta:", url);
-
+    console.log("[CromoSwap] URL a abrir:", url);
     setDownloadError(false);
+    setIsOpening(true);
 
-    const success = openExternalUrl(url);
-
-    if (!success) {
-      console.error("[CromoSwap] No se pudo abrir la URL de descarga del APK.");
-      setDownloadError(true);
+    try {
+      if (Capacitor.isNativePlatform()) {
+        // Entorno Android nativo: usar Capacitor Browser (abre Chrome Custom Tab)
+        console.log("[CromoSwap] Entorno nativo detectado");
+        console.log("[CromoSwap] Abriendo URL con Capacitor Browser");
+        await Browser.open({ url });
+        console.log("[CromoSwap] URL abierta correctamente");
+      } else {
+        // Entorno web / navegador: fallback a window.open
+        console.log("[CromoSwap] Entorno web detectado, usando window.open");
+        window.open(url, "_blank");
+      }
+    } catch (err) {
+      console.error("[CromoSwap] Error abriendo URL:", err);
+      // Fallback final: intentar window.open si Browser.open falla
+      try {
+        window.open(url, "_blank");
+      } catch {
+        setDownloadError(true);
+      }
+    } finally {
+      setIsOpening(false);
     }
   }
 
@@ -138,7 +116,8 @@ export function AndroidUpdateChecker() {
       <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-2xl">
         <h2 className="text-xl font-black text-ink">Nueva version disponible</h2>
         <p className="mt-2 text-sm font-semibold text-slate-600">
-          Tienes la version {currentVersion?.version ?? "instalada"}. La ultima version es {latestVersion.versionName}.
+          Tienes la version {currentVersion?.version ?? "instalada"}. La ultima version es{" "}
+          {latestVersion.versionName}.
         </p>
         {latestVersion.notes ? (
           <p className="mt-3 text-sm text-slate-600">{latestVersion.notes}</p>
@@ -153,9 +132,10 @@ export function AndroidUpdateChecker() {
         <button
           className="btn-primary mt-5 w-full"
           type="button"
+          disabled={isOpening}
           onClick={handleUpdatePress}
         >
-          Actualizar APK
+          {isOpening ? "Abriendo..." : "Actualizar APK"}
         </button>
 
         {!latestVersion.required ? (
